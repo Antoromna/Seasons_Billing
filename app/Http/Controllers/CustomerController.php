@@ -121,21 +121,28 @@ class CustomerController extends Controller
             ->with('success', 'Customer deleted successfully.');
     }
     public function storeOpeningBalance(Request $request)
-{
-    $request->validate([
-        'customer_id' => 'required|exists:customers,id',
-        'opening_balance' => 'required|numeric|min:1',
-    ]);
+    {
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'opening_balance' => 'required|numeric|min:1',
+        ]);
 
-    CustomerOpeningBalance::create([
-        'customer_id' => $request->customer_id,
-        'amount' => $request->opening_balance,
-        'remarks' => $request->remarks,
-    ]);
+        CustomerOpeningBalance::create([
+            'customer_id' => $request->customer_id,
+            'amount' => $request->opening_balance,
+            'remarks' => $request->remarks,
+        ]);
 
-    return back()->with(
-        'success',
-        'Opening Balance Added Successfully'
-    );
-}
+        return back()->with(
+            'success',
+            'Opening Balance Added Successfully'
+        );
+    }
+    public function print()
+    {
+        $customers = Customer::all();
+       
+
+        return view('customers.print', compact('customers'));
+    }
 }

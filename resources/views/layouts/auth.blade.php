@@ -20,7 +20,7 @@
         <a class="brand-mark" href="index.html" aria-label="adminHMD dashboard">
           <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
           <span class="brand-copy">
-            <span class="brand-title">adminHMD</span>
+            <span class="brand-title">Season Fruits</span>
             {{-- <span class="brand-subtitle">Admin Template</span> --}}
           </span>
         </a>
@@ -53,7 +53,7 @@
               <span class="nav-text">Sale</span>
           </a>
           <a class="nav-link {{ request()->routeIs('customer-ledger.*') ? 'active' : '' }}"
-   href="{{ route('customer-ledger.index') }}">
+            href="{{ route('customer-ledger.index') }}">
               <span class="nav-icon">
                   <i class="bi bi-journal-text"></i>
               </span>
@@ -183,10 +183,9 @@
             </div> --}}
 
 
-            <div class="dropdown">
+            {{-- <div class="dropdown">
               <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                {{-- <img class="avatar-img avatar-sm" src="{{ asset('assets/auth/images/avatar/avatar.jpg') }}" alt="Admin Hasan"> --}}
-                <span class=" d-none d-sm-inline">{{ auth()->user()->name }}</span>
+                <span class=" d-none d-sm-inline">Vanaja</span>
               </button>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="profile.html">Profile</a></li>
@@ -203,7 +202,7 @@
                     </form>
                 </li>
               </ul>
-            </div>
+            </div> --}}
           </div>
         </div>
       </nav>

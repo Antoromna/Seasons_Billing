@@ -10,11 +10,12 @@
               </div>
             </div>
             <div class="heading-actions">
-           <button class="btn btn-outline-secondary btn-sm"
-        onclick="printCustomers()">
-    <i class="bi bi-printer"></i> Print
-</button>
-                    <a class="btn btn-primary btn-sm" href="{{ route('customers.create') }}"><i class="bi bi-person-plus" aria-hidden="true"></i> Add Customer</a></div>
+                <a href="{{ route('customers.print') }}"
+                target="_blank"
+                class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-printer"></i> Print
+                </a>
+                <a class="btn btn-primary btn-sm" href="{{ route('customers.create') }}"><i class="bi bi-person-plus" aria-hidden="true"></i> Add Customer</a></div>
           </div>
 
         
@@ -185,10 +186,7 @@
             </tbody>
               </table>
             </div>
-            <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mt-3">
-              <p class="text-muted small mb-0">Showing 1 to 5 of 124 users</p>
-              <nav aria-label="Users pagination"><ul class="pagination pagination-sm mb-0"><li class="page-item disabled"><a class="page-link" href="#">Previous</a></li><li class="page-item active"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="#">2</a></li><li class="page-item"><a class="page-link" href="#">Next</a></li></ul></nav>
-            </div>
+           
           </section>
         </div>
 

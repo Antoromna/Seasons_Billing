@@ -11,8 +11,7 @@ use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
-    // return view('layouts.auth');
+    return redirect()->route('dashboard');
 });
 
 // Route::get('/dashboard', function () {
@@ -26,7 +25,11 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-
+//print
+Route::get('/customers/print', [CustomerController::class, 'print'])
+    ->name('customers.print');
+Route::get('/products/print', [ProductController::class, 'print'])
+    ->name('products.print');
 Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 Route::resource('customers', CustomerController::class);
 Route::resource('products', ProductController::class);
@@ -53,6 +56,6 @@ Route::get('/sales/{sale}/print', [SaleController::class, 'print'])
     ->name('sales.print');
 Route::prefix('reports')->group(function () {
 
-    Route::get('/product-wise', [ReportController::class, 'productWise'])
+Route::get('/product-wise', [ReportController::class, 'productWise'])
         ->name('reports.product-wise');
 });

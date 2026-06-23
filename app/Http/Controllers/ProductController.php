@@ -38,8 +38,8 @@ class ProductController extends Controller
             'unit' => 'required|in:box,kgs,tray',
 
             'tray_required' => $request->unit != 'box'
-    ? 'required|in:0,1'
-    : 'nullable',
+            ? 'required|in:0,1'
+            : 'nullable',
 
             'hsn_no' => 'nullable|string|max:100',
 
@@ -121,5 +121,11 @@ class ProductController extends Controller
         return redirect()
             ->route('products.index')
             ->with('success', 'Product deleted successfully.');
+    }
+    public function print()
+    {
+        $products = Product::orderBy('name')->get();
+
+        return view('products.print', compact('products'));
     }
 }

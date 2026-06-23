@@ -19,7 +19,11 @@
         </div>
 
         <div class="heading-actions">
-
+            <a class="btn btn-outline-secondary btn-sm"
+                href="{{ route('products.print') }}"
+                target="_blank">
+                    <i class="bi bi-printer"></i> Print
+                </a>
             <a class="btn btn-primary btn-sm"
                href="{{ route('products.create') }}">
 

@@ -123,14 +123,16 @@ class CustomerController extends Controller
     public function storeOpeningBalance(Request $request)
     {
         $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'opening_balance' => 'required|numeric|min:1',
+            'customer_id'      => 'required|exists:customers,id',
+            'entry_date'       => 'required|date',
+            'opening_balance'  => 'required|numeric|min:1',
         ]);
 
         CustomerOpeningBalance::create([
             'customer_id' => $request->customer_id,
-            'amount' => $request->opening_balance,
-            'remarks' => $request->remarks,
+            'entry_date'  => $request->entry_date,
+            'amount'      => $request->opening_balance,
+            'remarks'     => $request->remarks,
         ]);
 
         return back()->with(

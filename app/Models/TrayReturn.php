@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CustomerOpeningBalance extends Model
+class TrayReturn extends Model
 {
     protected $fillable = [
         'customer_id',
-        'entry_date',
-        'amount',
-        'remarks',
+        'return_date',
+        'tray_type',
+        'tray_qty',
+        'remarks'
     ];
 
     public function customer()

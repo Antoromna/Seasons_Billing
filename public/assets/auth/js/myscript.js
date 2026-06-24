@@ -204,7 +204,26 @@ function addProductRow()
     let trayType    = $('#trayType').val();
 
     let trayCount   = $('#trayCount').val();
+        // Tray validation
+        if (unit.toLowerCase() !== 'box') {
 
+            if (!trayType || trayType === 'No Tray') {
+                toastr.error('Please select tray type');
+                $('#trayType').focus();
+                return;
+            }
+
+            if (!trayCount || parseInt(trayCount) <= 0) {
+                toastr.error('Please enter tray quantity');
+                $('#trayCount').focus();
+                return;
+            }
+
+        } else {
+
+            trayType = 'No Tray';
+            trayCount = 0;
+        }
     let price       = $('#price').val();
 
     if(quantity == '' || quantity <= 0) {
@@ -447,6 +466,15 @@ console.log($(this).data());
         let html = '';
 
         $.each(response, function (i, row) {
+            let updateIcon = '';
+
+            if (row.is_updated) {
+                updateIcon = `
+                    <i class="bi bi-arrow-repeat text-warning ms-1"
+                    title="Last updated: ${row.updated_at}">
+                    </i>
+                `;
+            }
 
             html += `
                 <tr>
@@ -456,8 +484,9 @@ console.log($(this).data());
                         data-id="${row.sale_id}">
                             ${row.bill_id}
                         </a>
+                        ${updateIcon}
                     </td>
-                    <td>${row.date}</td>
+                    <td>${row.date} </td>
                     <td>₹ ${row.pending}</td>
                     <td>₹ ${row.received}</td>
                     <td>₹ ${row.ledger_balance}</td>
@@ -735,4 +764,40 @@ $(document).ready(function () {
         });
     });
 
+});
+
+$(document).on('click', '.trayLedger', function () {
+
+    let customerId = $(this).data('id');
+    let customerName = $(this).data('name');
+
+    $('#tray_customer_name').text(customerName);
+
+    $.get('/tray-returns/' + customerId + '/ledger', function (response) {
+
+        let html = '';
+
+        $.each(response, function (i, row) {
+
+            html += `
+                <tr>
+                    <td>${row.date}</td>
+                    <td>${row.reference}</td>
+                   <td>${row.big_given} / ${row.small_given}</td>
+
+                    <td>${row.big_returned} / ${row.small_returned}</td>
+
+                    <td>
+                        <span class="badge bg-danger">
+                            ${row.big_balance} / ${row.small_balance}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        });
+
+        $('#trayLedgerBody').html(html);
+
+        $('#trayLedgerModal').modal('show');
+    });
 });

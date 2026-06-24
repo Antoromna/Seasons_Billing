@@ -8,6 +8,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\CustomerLedgerController;
 use App\Http\Controllers\CustomerPaymentController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\TrayReturnController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -63,3 +64,14 @@ Route::get(
     '/customers/{customer}/balance',
     [SaleController::class, 'getBalance']
 );
+Route::resource('tray-returns', TrayReturnController::class);
+Route::get('/tray-returns-summary', [TrayReturnController::class, 'summary'])
+    ->name('tray-returns.summary');
+Route::get(
+    '/tray-returns/bill-details/{billNo}',
+    [TrayReturnController::class, 'billDetails']
+);
+Route::get(
+    '/tray-returns/{customer}/ledger',
+    [TrayReturnController::class, 'ledger']
+)->name('tray-returns.ledger');

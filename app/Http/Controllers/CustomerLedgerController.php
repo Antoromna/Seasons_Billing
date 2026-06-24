@@ -56,7 +56,7 @@ public function bills($customerId)
 
         $entries[] = [
             'type' => 'opening_balance',
-            'date' => $opening->created_at,
+            'date' => $opening->created_at->toDateTimeString(),
             'data' => $opening,
         ];
     }
@@ -68,7 +68,7 @@ public function bills($customerId)
 
         $entries[] = [
             'type' => 'sale',
-            'date' => $sale->bill_date,
+            'date' => $sale->created_at->toDateTimeString(),
             'data' => $sale,
         ];
     }
@@ -82,7 +82,7 @@ public function bills($customerId)
 
         $entries[] = [
             'type' => 'payment',
-            'date' => $payment->payment_date,
+            'date' => $payment->created_at->toDateTimeString(),
             'data' => $payment,
         ];
     }
@@ -112,7 +112,8 @@ public function bills($customerId)
                 'received' => 0,
                 'pending' => $opening->amount,
                 'ledger_balance' => $ledgerBalance,
-                 'remarks' => $opening->remarks,
+                'remarks' => $opening->remarks,
+                
                 
             ];
         }
@@ -138,7 +139,9 @@ public function bills($customerId)
                 'received' => $received,
                 'pending' => $pending,
                 'ledger_balance' => $ledgerBalance,
-                 'remarks' => $sale->remarks,
+                'remarks' => $sale->remarks,
+                'is_updated' => $sale->updated_at->timestamp != $sale->created_at->timestamp,
+                'updated_at' => $sale->updated_at->format('d-m-Y h:i A'),
             ];
         }
 

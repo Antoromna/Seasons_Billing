@@ -59,6 +59,15 @@
               </span>
               <span class="nav-text">Customer Ledger</span>
           </a>
+          <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('tray-returns.summary') ? 'active' : '' }}"
+              href="{{ route('tray-returns.summary') }}">
+                <span class="nav-icon">
+                    <i class="bi bi-grid"></i>
+                </span>
+                <span class="nav-text">Tray Ledger</span>
+            </a>
+          </li>
           @php
               $reportsActive = request()->is('reports*');
           @endphp

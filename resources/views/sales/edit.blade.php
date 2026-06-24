@@ -433,16 +433,23 @@
                         </div> --}}
 
                         <div class="d-flex justify-content-between mb-3">
-    <strong>Total Balance</strong>
-    <strong id="balance">0.00</strong>
-</div>
+                            <strong>Total Balance</strong>
+                            <strong id="balance">0.00</strong>
+                        </div>
 
-                        <button type="submit"
-                                class="btn btn-success w-100">
+                        <div class="d-flex gap-2">
 
-                            Update Sale
+                            <a href="{{ route('sales.index') }}"
+                            class="btn btn-secondary w-100">
+                                Cancel
+                            </a>
 
-                        </button>
+                            <button type="submit"
+                                    class="btn btn-success w-100">
+                                Update Sale
+                            </button>
+
+                        </div>
 
                     </div>
 

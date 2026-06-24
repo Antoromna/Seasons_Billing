@@ -132,8 +132,8 @@
                             <tr>
                                 <th>Bill ID</th>
                                 <th>Date</th>
-                                <th>Received</th>
                                 <th>To Be Received</th>
+                                <th>Amount Received</th>
                                 <th>Ledger Balance</th>
                                 <th>Remarks</th>
                             </tr>

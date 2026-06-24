@@ -438,9 +438,9 @@ console.log($(this).data());
 
     let openingBalance = $(this).data('opening') || 0;
 
-$('#customer_opening_balance').text(
-    Number(openingBalance).toFixed(2)
-);
+    $('#customer_opening_balance').text(
+        Number(openingBalance).toFixed(2)
+    );
 
     $.get('/customer-ledger/' + customerId + '/bills', function (response) {
 
@@ -458,8 +458,8 @@ $('#customer_opening_balance').text(
                         </a>
                     </td>
                     <td>${row.date}</td>
-                    <td>₹ ${row.received}</td>
                     <td>₹ ${row.pending}</td>
+                    <td>₹ ${row.received}</td>
                     <td>₹ ${row.ledger_balance}</td>
                     <td>${row.remarks ?? '-'}</td>
                 </tr>
@@ -581,9 +581,11 @@ $(document).on('keyup change', '.qty, .price', function () {
     calculateTotals();
 });
 //pagination
-$('.DataTable').DataTable({
-    paging: true
-});
+if ($.fn.DataTable) {
+    $('.DataTable').DataTable({
+        paging: true
+    });
+}
 
 function printTable() {
     let table = $('.DataTable').DataTable();
@@ -710,3 +712,27 @@ function printProductReport() {
         printWindow.close();
     }, 500);
 }
+//sale-previous balance
+$(document).ready(function () {
+
+    $('#customer_id').change(function () {
+
+        console.log('customer changed');
+
+        let customerId = $(this).val();
+
+        if (!customerId) {
+            $('#previousBalance').val(0);
+            calculateBalance();
+            return;
+        }
+
+        $.get('/customers/' + customerId + '/balance', function(response) {
+
+            $('#previousBalance').val(response.balance);
+
+            calculateBalance();
+        });
+    });
+
+});

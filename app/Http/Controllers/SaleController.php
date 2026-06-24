@@ -7,6 +7,8 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Models\CustomerOpeningBalance;
+use App\Models\CustomerPayment;
 use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
@@ -173,12 +175,14 @@ public function store(Request $request)
 }
 public function print($id)
 {
-    $sale = Sale::with([
-        'customer',
-        'items'
-    ])->findOrFail($id);
+    $sales = Sale::with(['customer','items'])
+        ->where('id', $id)
+        ->get();
 
-    return view('sales.print', compact('sale'));
+    return view('sales.print', [
+        'sales' => $sales,
+        'isBulk' => false
+    ]);
 }
 public function edit(Sale $sale)
 {
@@ -257,17 +261,31 @@ public function bulkPrint(Request $request)
 {
     $ids = explode(',', $request->ids);
 
-    $sales = Sale::with([
-        'customer',
-        'items'
-    ])
-    ->whereIn('id', $ids)
-    ->orderBy('bill_date')
-    ->get();
+    $sales = Sale::with(['customer','items'])
+        ->whereIn('id', $ids)
+        ->orderBy('bill_date')
+        ->get();
 
-    return view(
-        'sales.bulk-print',
-        compact('sales')
-    );
+    return view('sales.print', [
+        'sales' => $sales,
+        'isBulk' => true
+    ]);
+}
+public function getBalance($customerId)
+{
+    $openingBalance = CustomerOpeningBalance::where('customer_id', $customerId)
+        ->sum('amount');
+
+    $totalSales = Sale::where('customer_id', $customerId)
+        ->sum('net_amount');
+
+    $totalPayments = CustomerPayment::where('customer_id', $customerId)
+        ->sum('amount');
+
+    $balance = ($openingBalance + $totalSales) - $totalPayments;
+
+    return response()->json([
+        'balance' => $balance
+    ]);
 }
 }

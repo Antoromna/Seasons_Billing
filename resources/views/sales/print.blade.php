@@ -12,13 +12,44 @@
             font-family:Arial, sans-serif;
             font-size:12px;
         }
-
+        .section-total{
+            text-align: end;
+        }
         .invoice{
             width:420px;
             margin:0 auto;
             background:#fff;
             border:1px solid #000;
             padding:10px;
+        }
+        
+        .company{
+            font-size:18px;
+            font-weight:700;
+            color:#5b2c2c; /* dark maroon */
+            letter-spacing:1px;
+            margin-bottom:2px;
+        }
+
+        .subtitle{
+            font-size:13px;
+            font-weight:600;
+            color:#222;
+            margin-bottom:2px;
+        }
+
+        .address{
+            font-size:12px;
+            font-weight:600;
+            color:#333;
+            line-height:1.2;
+            margin-bottom:4px;
+        }
+
+        .phone{
+            font-size:12px;
+            font-weight:700;
+            color:#333;
         }
 
         .text-center{
@@ -30,7 +61,6 @@
         }
 
         .header{
-            border-bottom:1px solid #000;
             padding-bottom:5px;
             margin-bottom:5px;
         }
@@ -115,207 +145,307 @@
             @page{
                 margin:5mm;
             }
+            .page-break{
+                page-break-after: always;
+                break-after: page;
+            }
+
+            .invoice{
+                page-break-inside: avoid;
+            }
         }
 
     </style>
 </head>
 <body>
 
-<div class="btn-area">
+    @if(!isset($isBulk) || !$isBulk)
+    <div class="btn-area">
 
-    <button onclick="window.print()" class="btn green">
-        Print Original
-    </button>
+        <button onclick="window.print()" class="btn green">
+            Print Original
+        </button>
 
-    <button onclick="window.print()" class="btn blue">
-        Print Duplicate
-    </button>
+        <button onclick="window.print()" class="btn blue">
+            Print Duplicate
+        </button>
 
-    <a href="{{ url()->previous() }}" class="btn dark">
-        Back
-    </a>
+        <a href="{{ url()->previous() }}" class="btn dark">
+            Back
+        </a>
 
-</div>
+    </div>
+    @endif
+    @php
+        $totalCrates = 0;
+        $totalQty = 0;
+        $totalAmount = 0;
+    @endphp
 
-<div class="invoice">
+@foreach($sales as $sale)
+    <div class="invoice">
 
-    <div class="header">
+        <div class="header">
 
+            <table class="no-border">
+                <tr>
+                    <td width="25%">
+                        {{-- Logo --}}
+                        <img src="{{ asset('images/seasons.jpg') }}" width="70">
+                    </td>
+
+                    <td class="text-center">
+                        <div class="company">
+                            SEASONS FRUITS TRADERS
+                        </div>
+
+                        <div class="subtitle">
+                            Fresh Fruits Merchants & Commission Agents
+                        </div>
+
+                        <div class="address">
+                            1038, Bakyalakshmi Complex, Big Bazaar Street,<br>
+                            Coimbatore - 641001
+                        </div>
+
+                        <div class="phone">
+                            PH : 8144008056 , 8144008056
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+        <h3 style="
+            text-align:center;
+            color:darkred;
+            font-family:'Times New Roman', serif;
+            font-weight:700;
+            font-size:16px;
+            margin:8px 0;
+            text-decoration:underline;
+        ">
+            INVOICE
+        </h3>
         <table class="no-border">
             <tr>
-                <td width="25%">
-                    {{-- Logo --}}
-                    <img src="{{ asset('images/seasons.jpg') }}" width="70">
+                <td>
+                    <span style="font-size:16px;">Bill No :</span>
+
+                    <span style="font-size:16px; font-weight:700;">
+                        {{ $sale->bill_no }}
+                    </span>
                 </td>
 
-                <td class="text-center">
-                    <div class="company">
-                        SEASONS FRUITS TRADERS
-                    </div>
+                <td class="text-right" style="font-size:16px;">
+                    Date :
+                    <span style="font-weight:700;">
+                        {{ \Carbon\Carbon::parse($sale->bill_date)->format('d/m/Y') }}
+                    </span>
+                </td>
+            </tr>
 
-                    <div class="small">
-                        Fresh Fruits Merchants & Commission Agents
-                    </div>
-
-                    <div class="small">
-                        1038, Bakyalakshmi Complex,
-                        Big Bazaar Street,
-                        Coimbatore - 641001
-                    </div>
-
-                    <div class="small">
-                        PH : 8144008056
-                    </div>
+            <tr>
+                <td colspan="2" style="font-size:16px;">
+                    To :
+                    <span style="font-weight:700;">
+                        {{ $sale->customer->name ?? '' }}
+                    </span>
                 </td>
             </tr>
         </table>
 
-    </div>
+        <br>
 
-    <table class="no-border">
-        <tr>
-            <td>
-                <strong>Bill No :</strong>
-                {{ $sale->bill_no }}
-            </td>
+        <table>
 
-            <td class="text-right">
-                <strong>Date :</strong>
-                {{ \Carbon\Carbon::parse($sale->bill_date)->format('d/m/Y') }}
-            </td>
-        </tr>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Particulars</th>
+                    <th>Crates</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
 
-        <tr>
-            <td colspan="2">
-                <strong>To :</strong>
-                {{ $sale->customer->name ?? '' }}
-            </td>
-        </tr>
-    </table>
+            <tbody>
 
-    <br>
+                @foreach($sale->items as $key => $item)
 
-    <table>
+                @php
+                    $totalCrates += $item->tray_qty ?? 0;
+                    $totalQty += $item->quantity;
+                    $totalAmount += $item->total;
+                @endphp
 
-        <thead>
+                <tr>
+                    <td>{{ $key + 1 }}</td>
+                    <td>{{ $item->product }}</td>
+                    <td>{{ $item->tray_qty }}</td>
+                    <td>{{ $item->quantity }}</td>
+                    <td>{{ number_format($item->price,2) }}</td>
+                    <td>{{ number_format($item->total,2) }}</td>
+                </tr>
+
+                @endforeach
+
+                <tr>
+                    <td colspan="2" style="text-align:right;">
+                        <strong>Total</strong>
+                    </td>
+                    <td>
+                        <strong>{{ $totalCrates }}</strong>
+                    </td>
+                    <td>
+                        <strong>{{ $totalQty }}</strong>
+                    </td>
+                    <td colspan="2" style="text-align:right;">
+                        <strong>{{ number_format($totalAmount,2) }}</strong>
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+        @php
+
+            $openingBalance =
+                \App\Models\CustomerOpeningBalance::where(
+                    'customer_id',
+                    $sale->customer_id
+                )->sum('amount');
+
+            $previousSales =
+                \App\Models\Sale::where('customer_id', $sale->customer_id)
+                    ->where('id', '<', $sale->id)
+                    ->sum('net_amount');
+
+            $payments =
+                \App\Models\CustomerPayment::where(
+                    'customer_id',
+                    $sale->customer_id
+                )->sum('amount');
+
+            $previousBalance =
+                $openingBalance +
+                $previousSales -
+                $payments;
+
+            $ledgerBalance =
+                $previousBalance +
+                $sale->net_amount;
+
+        @endphp
+
+    <table class="no-border" style="margin-top:5px;">
             <tr>
-                <th>S.No</th>
-                <th>Particulars</th>
-                <th>Qty</th>
-                <th>Rate</th>
-                <th>Amount</th>
+
+            {{-- Left Side --}}
+            <td width="45%" valign="top">
+
+                <table style="width:100%; border-collapse:collapse; border:1px solid #000;">
+                    <tr>
+                        <th style="border:1px solid #000;">Crates</th>
+                        <th style="border:1px solid #000;">B</th>
+                        <th style="border:1px solid #000;">S</th>
+                    </tr>
+
+                    <tr>
+                        <td style="border:1px solid #000;">Pre Balance</td>
+                        <td style="border:1px solid #000;"></td>
+                        <td style="border:1px solid #000;"></td>
+                    </tr>
+
+                    <tr>
+                        <td style="border:1px solid #000;">Todays Sales</td>
+                        <td style="border:1px solid #000;">{{ $totalCrates }}</td>
+                        <td style="border:1px solid #000;"></td>
+                    </tr>
+
+                    <tr>
+                        <td style="border:1px solid #000;">Balance</td>
+                        <td style="border:1px solid #000;"></td>
+                        <td style="border:1px solid #000;"></td>
+                    </tr>
+                </table>
+
+            </td>
+
+            {{-- Right Side --}}
+            <td width="55%" valign="top">
+
+                <table>
+                    <tr>
+                        <td class="section-total">Prev. Balance</td>
+                        <td style="text-align:center;">: ₹</td>
+                        <td style="text-align:right;">
+                            {{ number_format($previousBalance,2) }}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="section-total">Bill Amount</td>
+                        <td style="text-align:center;">: ₹</td>
+                        <td style="text-align:right;">
+                            {{ number_format($sale->net_amount,2) }}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="section-total">
+                            <strong>Net Balance</strong>
+                        </td>
+
+                        <td style="text-align:center;">
+                            <strong>: ₹</strong>
+                        </td>
+
+                        <td style="text-align:right;">
+                            <strong>
+                                {{ number_format($ledgerBalance,2) }}
+                            </strong>
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+
             </tr>
-        </thead>
+        </table>
+        <br>
+        <pre style="font-size:11px; font-family:Arial,sans-serif; margin:0;">
+        Bank Details                   : <strong>For SEASONS FRUITS TRADERS</strong>
+        Bank Name / A/c No       : <strong>HDFC BANK / 50200028709842</strong>
+        Branch / IFSC Code       : 
+        </pre>
+        <br>
 
-        <tbody>
+        <div style="text-align:right;">
+            <strong style=" color: darkred;font-size: small;">
+                For Seasons Fruits Traders
+            </strong>
+        </div>
 
-            @foreach($sale->items as $key => $item)
-
-            <tr>
-                <td>{{ $key + 1 }}</td>
-
-                <td>{{ $item->product }}</td>
-
-                <td>{{ $item->quantity }}</td>
-
-                <td>{{ number_format($item->price,2) }}</td>
-
-                <td>{{ number_format($item->total,2) }}</td>
-            </tr>
-
-            @endforeach
-
-        </tbody>
-
-    </table>
-
-    @php
-
-        $openingBalance =
-            \App\Models\CustomerOpeningBalance::where(
-                'customer_id',
-                $sale->customer_id
-            )->sum('amount');
-
-        $previousSales =
-            \App\Models\Sale::where('customer_id', $sale->customer_id)
-                ->where('id', '<', $sale->id)
-                ->sum('net_amount');
-
-        $payments =
-            \App\Models\CustomerPayment::where(
-                'customer_id',
-                $sale->customer_id
-            )->sum('amount');
-
-        $previousBalance =
-            $openingBalance +
-            $previousSales -
-            $payments;
-
-        $ledgerBalance =
-            $previousBalance +
-            $sale->net_amount;
-
-    @endphp
-
-    <br>
-
-    <table class="summary">
-
-        <tr>
-            <td width="70%">
-                Prev. Balance
-            </td>
-
-            <td class="text-right">
-                ₹ {{ number_format($previousBalance,2) }}
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                Bill Amount
-            </td>
-
-            <td class="text-right">
-                ₹ {{ number_format($sale->net_amount,2) }}
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <strong>Net Balance</strong>
-            </td>
-
-            <td class="text-right">
-                <strong>
-                    ₹ {{ number_format($ledgerBalance,2) }}
-                </strong>
-            </td>
-        </tr>
-
-    </table>
-
-    <br>
-
-    <div class="small">
-        Bank Details
     </div>
+    @if(!$loop->last)
+        <div class="page-break"></div>
+    @endif
+@endforeach
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    window.print();
+});
+window.onload = function () {
+    window.print();
 
-    <div class="small">
-        HDFC BANK
-    </div>
-
-    <br><br>
-
-    <div class="text-right">
-        <strong>
-            For Seasons Fruits Traders
-        </strong>
-    </div>
-
-</div>
-
+    window.onafterprint = function () {
+        window.close();
+    };
+};
+</script>
 </body>
+
 </html>

@@ -59,3 +59,7 @@ Route::prefix('reports')->group(function () {
 Route::get('/product-wise', [ReportController::class, 'productWise'])
         ->name('reports.product-wise');
 });
+Route::get(
+    '/customers/{customer}/balance',
+    [SaleController::class, 'getBalance']
+);

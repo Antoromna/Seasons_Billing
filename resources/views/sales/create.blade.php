@@ -297,20 +297,20 @@
                     <div class="card-body">
 
                         <div class="d-flex justify-content-between mb-3">
-    <strong>Current Bill Amount</strong>
-    <strong id="netAmount">0.00</strong>
-</div>
+                            <strong>Current Bill Amount</strong>
+                            <strong id="netAmount">0.00</strong>
+                        </div>
 
                         <div class="d-flex align-items-center justify-content-between mb-3">
-    <strong class="me-3">Previous Balance</strong>
+                            <strong class="me-3">Previous Balance</strong>
 
-    <input type="number"
-           name="previous_balance"
-           id="previousBalance"
-           class="form-control"
-           value="0"
-           style="max-width: 150px;">
-</div>
+                            <input type="number"
+                                name="previous_balance"
+                                id="previousBalance"
+                                class="form-control"
+                                value="{{ $previousBalance ?? 0 }}"
+                                readonly style="max-width: 150px;">
+                        </div>
 
                         {{-- <div class="mb-3">
 
@@ -327,16 +327,23 @@
                         </div> --}}
 
                         <div class="d-flex justify-content-between mb-3">
-    <strong>Total Balance</strong>
-    <strong id="balance">0.00</strong>
-</div>
+                            <strong>Total Balance</strong>
+                            <strong id="balance">0.00</strong>
+                        </div>
 
-                        <button type="submit"
-                                class="btn btn-success w-100">
+                        <div class="d-flex gap-2">
 
-                            Save Sale
+                            <a href="{{ route('sales.index') }}"
+                            class="btn btn-secondary w-100">
+                                Cancel
+                            </a>
 
-                        </button>
+                            <button type="submit"
+                                    class="btn btn-success w-100">
+                                Save Sale
+                            </button>
+
+                        </div>
 
                     </div>
 

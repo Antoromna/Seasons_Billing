@@ -166,4 +166,33 @@ public function bills($customerId)
 
     return response()->json($data);
 }
+public function print()
+{
+    $customers = Customer::orderBy('name')->get();
+
+    foreach ($customers as $customer) {
+
+        $openingBalance = CustomerOpeningBalance::where(
+            'customer_id',
+            $customer->id
+        )->sum('amount');
+
+        $salesAmount = Sale::where(
+            'customer_id',
+            $customer->id
+        )->sum('net_amount');
+
+        $paymentsReceived = CustomerPayment::where(
+            'customer_id',
+            $customer->id
+        )->sum('amount');
+
+        $customer->due_amount =
+            $openingBalance +
+            $salesAmount -
+            $paymentsReceived;
+    }
+
+    return view('customer-ledger.print', compact('customers'));
+}
 }

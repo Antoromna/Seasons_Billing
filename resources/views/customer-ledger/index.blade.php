@@ -52,6 +52,13 @@
                     <span>Customers</span>
                 </h2>
             </div>
+            <div class="heading-actions">
+                <a href="{{ route('customer-ledger.print') }}"
+                    target="_blank"
+                    class="btn btn-primary btn-sm">
+                        <i class="bi bi-printer"></i> Print
+                </a> 
+            </div>
 
         </div>
 

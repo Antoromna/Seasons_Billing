@@ -448,8 +448,10 @@ moveOnEnter('#price', function () {
     addProductRow();
 });
 //customer-ledger
+let selectedCustomerId = '';
 $(document).on('click', '.customerLedger', function () {
 console.log($(this).data());
+    selectedCustomerId = $(this).data('id');
     let customerId = $(this).data('id');
     let customerName = $(this).data('name');
     // let openingBalance = $(this).data('opening');
@@ -800,4 +802,16 @@ $(document).on('click', '.trayLedger', function () {
 
         $('#trayLedgerModal').modal('show');
     });
+});
+$(document).on('click', '#printLedgerBtn', function () {
+
+    let fromDate = $('#from_date').val() || '';
+    let toDate   = $('#to_date').val() || '';
+
+    let url =
+        '/customer-ledger/' + selectedCustomerId +
+        '/print?from_date=' + fromDate +
+        '&to_date=' + toDate;
+
+    window.open(url, '_blank');
 });

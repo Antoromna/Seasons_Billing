@@ -77,3 +77,5 @@ Route::get(
 )->name('tray-returns.ledger');
 Route::get('/customer-ledger/print', [CustomerLedgerController::class, 'print'])
     ->name('customer-ledger.print');
+Route::get('/customer-ledger/{customer}/print', [CustomerLedgerController::class, 'printLedger'])
+    ->name('customer-ledger.print');

@@ -176,13 +176,15 @@
 
     </div>
     @endif
+   @foreach($sales as $sale)
+
     @php
+        $bigCrates = 0;
+        $smallCrates = 0;
         $totalCrates = 0;
         $totalQty = 0;
         $totalAmount = 0;
     @endphp
-
-@foreach($sales as $sale)
     <div class="invoice">
 
         <div class="header">
@@ -276,6 +278,13 @@
 
                 @php
                     $totalCrates += $item->tray_qty ?? 0;
+
+                    if ($item->tray == 'Big') {
+                        $bigCrates += $item->tray_qty;
+                    } elseif ($item->tray == 'Small') {
+                        $smallCrates += $item->tray_qty;
+                    }
+
                     $totalQty += $item->quantity;
                     $totalAmount += $item->total;
                 @endphp
@@ -320,7 +329,7 @@
 
             $previousSales =
                 \App\Models\Sale::where('customer_id', $sale->customer_id)
-                    ->where('id', '<', $sale->id)
+                    ->whereDate('bill_date', '<', $sale->bill_date)
                     ->sum('net_amount');
 
             $payments =
@@ -355,20 +364,20 @@
 
                     <tr>
                         <td style="border:1px solid #000;">Pre Balance</td>
-                        <td style="border:1px solid #000;"></td>
-                        <td style="border:1px solid #000;"></td>
+                        <td style="border:1px solid #000;">{{ $sale->previousBigBalance }}</td>
+                        <td style="border:1px solid #000;">{{ $sale->previousSmallBalance }}</td>
                     </tr>
 
                     <tr>
                         <td style="border:1px solid #000;">Todays Sales</td>
-                        <td style="border:1px solid #000;">{{ $totalCrates }}</td>
-                        <td style="border:1px solid #000;"></td>
+                        <td style="border:1px solid #000;">{{ $sale->bigCrates }}</td>
+                        <td style="border:1px solid #000;">{{ $sale->smallCrates }}</td>
                     </tr>
 
                     <tr>
                         <td style="border:1px solid #000;">Balance</td>
-                        <td style="border:1px solid #000;"></td>
-                        <td style="border:1px solid #000;"></td>
+                        <td style="border:1px solid #000;">{{ $sale->currentBigBalance }}</td>
+                        <td style="border:1px solid #000;">{{ $sale->currentSmallBalance }}</td>
                     </tr>
                 </table>
 

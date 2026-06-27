@@ -128,6 +128,23 @@
                         class="btn-close"
                         data-bs-dismiss="modal"></button>
             </div>
+            <div class="row w-100">
+                <div class="col-md-3">
+                    <input type="date" id="from_date" class="form-control">
+                </div>
+
+                <div class="col-md-3">
+                    <input type="date" id="to_date" class="form-control">
+                </div>
+
+                <div class="col-md-3">
+                    <button type="button"
+                            id="printLedgerBtn"
+                            class="btn btn-primary">
+                        Print
+                    </button>
+                </div>
+            </div>
 
             <div class="modal-body">
 

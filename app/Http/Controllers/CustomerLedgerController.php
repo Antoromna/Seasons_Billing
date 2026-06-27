@@ -195,4 +195,171 @@ public function print()
 
     return view('customer-ledger.print', compact('customers'));
 }
+
+
+public function printLedger(Request $request, Customer $customer)
+{
+    $entries = [];
+
+    $openingBalances = CustomerOpeningBalance::where(
+        'customer_id',
+        $customer->id
+    );
+
+    if ($request->filled('from_date')) {
+        $openingBalances->whereDate(
+            'created_at',
+            '>=',
+            $request->from_date
+        );
+    }
+
+    if ($request->filled('to_date')) {
+        $openingBalances->whereDate(
+            'created_at',
+            '<=',
+            $request->to_date
+        );
+    }
+
+    $openingBalances = $openingBalances->get();
+
+    foreach ($openingBalances as $opening) {
+
+        $entries[] = [
+            'type' => 'opening_balance',
+            'date' => $opening->created_at->toDateTimeString(),
+            'data' => $opening,
+        ];
+    }
+
+    $sales = Sale::with('items.product')
+        ->where('customer_id', $customer->id);
+
+    if ($request->filled('from_date')) {
+        $sales->whereDate(
+            'bill_date',
+            '>=',
+            $request->from_date
+        );
+    }
+
+    if ($request->filled('to_date')) {
+        $sales->whereDate(
+            'bill_date',
+            '<=',
+            $request->to_date
+        );
+    }
+
+    $sales = $sales->get();
+
+    foreach ($sales as $sale) {
+
+        $entries[] = [
+            'type' => 'sale',
+            'date' => $sale->created_at->toDateTimeString(),
+            'data' => $sale,
+        ];
+    }
+
+    $payments = CustomerPayment::where(
+            'customer_id',
+            $customer->id
+        )
+        ->whereNull('sale_id');
+
+    if ($request->filled('from_date')) {
+        $payments->whereDate(
+            'payment_date',
+            '>=',
+            $request->from_date
+        );
+    }
+
+    if ($request->filled('to_date')) {
+        $payments->whereDate(
+            'payment_date',
+            '<=',
+            $request->to_date
+        );
+    }
+
+    $payments = $payments->get();
+
+    foreach ($payments as $payment) {
+
+        $entries[] = [
+            'type' => 'payment',
+            'date' => $payment->created_at->toDateTimeString(),
+            'data' => $payment,
+        ];
+    }
+
+    usort($entries, function ($a, $b) {
+        return strtotime($a['date']) <=> strtotime($b['date']);
+    });
+
+    $ledger = [];
+
+    foreach ($entries as $entry) {
+
+        if ($entry['type'] == 'opening_balance') {
+
+            $opening = $entry['data'];
+
+            $ledger[] = [
+                'date' => $opening->created_at,
+                'bill_no' => 'Opening Balance',
+                'type' => 'opening_balance',
+                'sale' => null,
+                'debit' => $opening->amount,
+                'credit' => 0,
+                'remarks' => $opening->remarks,
+            ];
+        }
+
+        elseif ($entry['type'] == 'sale') {
+
+            $sale = $entry['data'];
+
+            $received = CustomerPayment::where(
+                'sale_id',
+                $sale->id
+            )->sum('amount');
+
+            $pending = $sale->net_amount - $received;
+
+            $ledger[] = [
+                'date' => $sale->bill_date,
+                'bill_no' => $sale->bill_no,
+                'type' => 'sale',
+                'sale' => $sale,
+                'debit' => $pending,
+                'credit' => $received,
+                'remarks' => $sale->notes,
+            ];
+        }
+
+        else {
+
+            $payment = $entry['data'];
+
+            $ledger[] = [
+                'date' => $payment->payment_date,
+                'bill_no' => 'General Payment',
+                'type' => 'payment',
+                'sale' => null,
+                'debit' => 0,
+                'credit' => $payment->amount,
+                'remarks' => $payment->remarks,
+            ];
+        }
+    }
+
+    return view(
+        'customer-ledger.print_ledger',
+        compact('customer', 'ledger')
+    );
+}
 }

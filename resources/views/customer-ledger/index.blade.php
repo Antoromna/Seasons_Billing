@@ -370,6 +370,21 @@
                                required>
 
                     </div>
+                    <div class="mb-3 d-none" id="discount_div">
+
+                        <label class="form-label">
+                            Discount Amount
+                        </label>
+
+                        <input type="number"
+                            name="discount_amount"
+                            id="discount_amount"
+                            class="form-control"
+                            value="0"
+                            min="0"
+                            step="0.01">
+
+                    </div>
 
                     <div class="mb-3">
 

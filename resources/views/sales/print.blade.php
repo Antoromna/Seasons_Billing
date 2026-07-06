@@ -125,6 +125,67 @@
         .dark{
             background:#343a40;
         }
+        thead th,
+        .total-row td{
+            border:1px solid #000;
+        }
+
+        .item-row td{
+            border-left:1px solid #000;
+            border-right:1px solid #000;
+            border-top:none;
+            border-bottom:none;
+        }
+        .balance-table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        .balance-table td{
+            border:none !important;
+            padding:2px 4px;
+            font-size:11px;
+        }
+
+        .balance-table .label{
+            text-align:right;
+            width:65%;
+        }
+
+        .balance-table .colon{
+            width:10%;
+            text-align:center;
+        }
+
+        .balance-table .amount{
+            width:25%;
+            text-align:right;
+        }
+
+        .balance-table .net-row td{
+            border-top:1px solid #000 !important;
+            font-weight:bold;
+        }
+        .crate-table{
+            width:100%;
+            border-collapse:collapse;
+            border:1px solid #000;
+        }
+
+        .crate-table th{
+            border:1px solid #000 !important;
+        }
+
+        .crate-table td{
+            border-left:1px solid #000 !important;
+            border-right:1px solid #000 !important;
+            border-top:none !important;
+            border-bottom:none !important;
+        }
+
+        .crate-table tr:last-child td{
+            border-bottom:1px solid #000 !important;
+        }
 
         @media print{
 
@@ -193,7 +254,7 @@
                 <tr>
                     <td width="25%">
                         {{-- Logo --}}
-                        <img src="{{ asset('images/seasons.jpg') }}" width="70">
+                        <img src="{{ asset('images/Seasons_Logo.png') }}" width="70">
                     </td>
 
                     <td class="text-center">
@@ -289,7 +350,7 @@
                     $totalAmount += $item->total;
                 @endphp
 
-                <tr>
+                <tr class="item-row">
                     <td>{{ $key + 1 }}</td>
                     <td>{{ $item->product }}</td>
                     <td>{{ $item->tray_qty }}</td>
@@ -332,16 +393,17 @@
                     ->whereDate('bill_date', '<', $sale->bill_date)
                     ->sum('net_amount');
 
-            $payments =
-                \App\Models\CustomerPayment::where(
-                    'customer_id',
-                    $sale->customer_id
-                )->sum('amount');
+            $payment = \App\Models\CustomerPayment::where('customer_id', $sale->customer_id)
+                ->selectRaw('SUM(amount) as amount, SUM(discount_amount) as discount')
+                ->first();
+
+            $payments = $payment->amount ?? 0;
+            $discount = $payment->discount ?? 0;
 
             $previousBalance =
                 $openingBalance +
                 $previousSales -
-                $payments;
+                ($payments + $discount);
 
             $ledgerBalance =
                 $previousBalance +
@@ -349,73 +411,64 @@
 
         @endphp
 
-    <table class="no-border" style="margin-top:5px;">
-            <tr>
+            <table class="no-border" style="margin-top:5px;">
+                <tr>
 
-            {{-- Left Side --}}
-            <td width="45%" valign="top">
+                    <td width="45%" valign="top">
 
-                <table style="width:100%; border-collapse:collapse; border:1px solid #000;">
+                        <table class="crate-table">
+                            <tr>
+                    <th>Crates</th>
+                    <th>B</th>
+                    <th>S</th>
+                </tr>
+
+                <tr>
+                    <td>Pre Balance</td>
+                    <td>{{ $sale->previousBigBalance }}</td>
+                    <td>{{ $sale->previousSmallBalance }}</td>
+                </tr>
+
+                <tr>
+                    <td>Todays Sales</td>
+                    <td>{{ $sale->bigCrates }}</td>
+                    <td>{{ $sale->smallCrates }}</td>
+                </tr>
+
+                <tr>
+                    <td>Balance</td>
+                    <td>{{ $sale->currentBigBalance }}</td>
+                    <td>{{ $sale->currentSmallBalance }}</td>
+                </tr>
+                            </table>
+
+                        </td>
+
+                        {{-- Right Side --}}
+                        <td width="55%" valign="top">
+
+                <table class="balance-table">
                     <tr>
-                        <th style="border:1px solid #000;">Crates</th>
-                        <th style="border:1px solid #000;">B</th>
-                        <th style="border:1px solid #000;">S</th>
-                    </tr>
-
-                    <tr>
-                        <td style="border:1px solid #000;">Pre Balance</td>
-                        <td style="border:1px solid #000;">{{ $sale->previousBigBalance }}</td>
-                        <td style="border:1px solid #000;">{{ $sale->previousSmallBalance }}</td>
-                    </tr>
-
-                    <tr>
-                        <td style="border:1px solid #000;">Todays Sales</td>
-                        <td style="border:1px solid #000;">{{ $sale->bigCrates }}</td>
-                        <td style="border:1px solid #000;">{{ $sale->smallCrates }}</td>
-                    </tr>
-
-                    <tr>
-                        <td style="border:1px solid #000;">Balance</td>
-                        <td style="border:1px solid #000;">{{ $sale->currentBigBalance }}</td>
-                        <td style="border:1px solid #000;">{{ $sale->currentSmallBalance }}</td>
-                    </tr>
-                </table>
-
-            </td>
-
-            {{-- Right Side --}}
-            <td width="55%" valign="top">
-
-                <table>
-                    <tr>
-                        <td class="section-total">Prev. Balance</td>
-                        <td style="text-align:center;">: ₹</td>
-                        <td style="text-align:right;">
+                        <td class="label">Prev. Balance</td>
+                        <td class="colon">: ₹</td>
+                        <td class="amount">
                             {{ number_format($previousBalance,2) }}
                         </td>
                     </tr>
 
                     <tr>
-                        <td class="section-total">Bill Amount</td>
-                        <td style="text-align:center;">: ₹</td>
-                        <td style="text-align:right;">
+                        <td class="label">Bill Amount</td>
+                        <td class="colon">: ₹</td>
+                        <td class="amount">
                             {{ number_format($sale->net_amount,2) }}
                         </td>
                     </tr>
 
-                    <tr>
-                        <td class="section-total">
-                            <strong>Net Balance</strong>
-                        </td>
-
-                        <td style="text-align:center;">
-                            <strong>: ₹</strong>
-                        </td>
-
-                        <td style="text-align:right;">
-                            <strong>
-                                {{ number_format($ledgerBalance,2) }}
-                            </strong>
+                    <tr class="net-row">
+                        <td class="label"><strong>Net Balance</strong></td>
+                        <td class="colon"><strong>: ₹</strong></td>
+                        <td class="amount">
+                            <strong>{{ number_format($ledgerBalance,2) }}</strong>
                         </td>
                     </tr>
                 </table>
@@ -424,12 +477,11 @@
 
             </tr>
         </table>
-        <br>
-        <pre style="font-size:11px; font-family:Arial,sans-serif; margin:0;">
-        Bank Details                   : <strong>For SEASONS FRUITS TRADERS</strong>
-        Bank Name / A/c No       : <strong>HDFC BANK / 50200028709842</strong>
+        <div style="font-size:11px; font-family:Arial,sans-serif; margin:0;">
+        Bank Details                   : <strong>For SEASONS FRUITS TRADERS</strong> <br>
+        Bank Name / A/c No       : <strong>HDFC BANK / 50200028709842</strong> <br>
         Branch / IFSC Code       : 
-        </pre>
+        </div>
         <br>
 
         <div style="text-align:right;">

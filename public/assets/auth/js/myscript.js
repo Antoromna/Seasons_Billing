@@ -815,3 +815,19 @@ $(document).on('click', '#printLedgerBtn', function () {
 
     window.open(url, '_blank');
 });
+$('#payment_type').change(function () {
+
+    if ($(this).val() == 'bill') {
+
+        $('#sale_div').removeClass('d-none');
+        $('#discount_div').removeClass('d-none');
+
+    } else {
+
+        $('#sale_div').addClass('d-none');
+        $('#discount_div').addClass('d-none');
+
+        $('#discount_amount').val(0);
+    }
+
+});

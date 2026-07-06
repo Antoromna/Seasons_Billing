@@ -10,6 +10,7 @@ class CustomerPayment extends Model
         'customer_id',
         'sale_id',
         'amount',
+        'discount_amount',
         'payment_date',
         'remarks',
     ];

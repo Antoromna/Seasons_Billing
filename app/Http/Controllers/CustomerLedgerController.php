@@ -26,15 +26,17 @@ public function index()
                 $customer->id
             )->sum('net_amount');
 
-        $paymentsReceived = CustomerPayment::where(
-                'customer_id',
-                $customer->id
-            )->sum('amount');
+       $payment = CustomerPayment::where('customer_id', $customer->id)
+            ->selectRaw('SUM(amount) as amount, SUM(discount_amount) as discount')
+            ->first();
+
+        $paymentsReceived = $payment->amount ?? 0;
+        $discountReceived = $payment->discount ?? 0;
 
         $customer->due_amount =
             $openingBalance
             + $salesAmount
-            - $paymentsReceived;
+            - ($paymentsReceived + $discountReceived);
     }
 
     return view('customer-ledger.index', compact('customers'));
@@ -123,12 +125,13 @@ public function bills($customerId)
 
             $sale = $entry['data'];
 
-            $received = CustomerPayment::where(
-                'sale_id',
-                $sale->id
-            )->sum('amount');
+            $received = CustomerPayment::where('sale_id', $sale->id)
+                ->sum('amount');
 
-            $pending = $sale->net_amount - $received;
+            $discount = CustomerPayment::where('sale_id', $sale->id)
+                ->sum('discount_amount');
+
+            $pending = $sale->net_amount - ($received + $discount);
 
             $ledgerBalance += $pending;
 
@@ -182,15 +185,17 @@ public function print()
             $customer->id
         )->sum('net_amount');
 
-        $paymentsReceived = CustomerPayment::where(
-            'customer_id',
-            $customer->id
-        )->sum('amount');
+        $payment = CustomerPayment::where('customer_id', $customer->id)
+            ->selectRaw('SUM(amount) as amount, SUM(discount_amount) as discount')
+            ->first();
+
+        $paymentsReceived = $payment->amount ?? 0;
+        $discountReceived = $payment->discount ?? 0;
 
         $customer->due_amount =
             $openingBalance +
             $salesAmount -
-            $paymentsReceived;
+            ($paymentsReceived + $discountReceived);
     }
 
     return view('customer-ledger.print', compact('customers'));

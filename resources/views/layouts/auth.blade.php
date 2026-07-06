@@ -18,7 +18,7 @@
     <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
       <div class="sidebar-header">
         <a class="brand-mark" href="index.html" aria-label="adminHMD dashboard">
-          <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
+          <img src="{{ asset('images/Seasons_Logo.png') }}" width="60">
           <span class="brand-copy">
             <span class="brand-title">Season Fruits</span>
             {{-- <span class="brand-subtitle">Admin Template</span> --}}

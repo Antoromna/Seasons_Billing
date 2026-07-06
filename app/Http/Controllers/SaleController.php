@@ -252,10 +252,16 @@ public function print($id)
                 ->whereDate('bill_date', '<', $sale->bill_date)
                 ->sum('net_amount');
 
-            $payments = CustomerPayment::where(
-                'customer_id',
-                $sale->customer_id
-            )->sum('amount');
+            $payments = CustomerPayment::where('customer_id', $sale->customer_id)
+                ->sum('amount');
+
+            $discount = CustomerPayment::where('customer_id', $sale->customer_id)
+                ->sum('discount_amount');
+
+            $sale->previousBalance =
+                $openingBalance +
+                $previousSales -
+                ($payments + $discount);
 
             $sale->previousBalance =
                 $openingBalance +
@@ -367,10 +373,14 @@ public function getBalance($customerId)
     $totalSales = Sale::where('customer_id', $customerId)
         ->sum('net_amount');
 
-    $totalPayments = CustomerPayment::where('customer_id', $customerId)
-        ->sum('amount');
+    $payment = CustomerPayment::where('customer_id', $customerId)
+    ->selectRaw('SUM(amount) as amount, SUM(discount_amount) as discount')
+    ->first();
 
-    $balance = ($openingBalance + $totalSales) - $totalPayments;
+    $totalPayments = $payment->amount ?? 0;
+    $totalDiscount = $payment->discount ?? 0;
+
+    $balance = ($openingBalance + $totalSales) - ($totalPayments + $totalDiscount);
 
     return response()->json([
         'balance' => $balance

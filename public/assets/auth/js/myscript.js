@@ -89,27 +89,32 @@ let rowCount = 1;
 // Product select
 $('#productSelect').on('change', function () {
 
-    let selected = $(this).find(':selected');
+    let productId = this.tomselect.getValue();
+
+    let selected = $('#productSelect option[value="' + productId + '"]');
+
+    console.log(selected.data('tray-required'));
+
+    let trayRequired = parseInt(selected.data('tray-required')) || 0;
+
+    console.log('Tray Required:', trayRequired);
+
+    if (trayRequired === 0) {
+
+        $('#trayType').val('No Tray').prop('disabled', true);
+        $('#trayCount').val(0).prop('disabled', true);
+
+    } else {
+
+        $('#trayType').prop('disabled', false);
+        $('#trayCount').prop('disabled', false);
+
+    }
 
     let unit = selected.data('unit') || '';
 
     $('#unit').val(unit);
     $('#price').val(selected.data('price') || '');
-
-    if(unit.toLowerCase() === 'box') {
-
-        $('#trayType').val('No Tray').prop('disabled', true);
-
-        $('#trayCount')
-            .val(0)
-            .prop('disabled', true);
-
-    } else {
-
-        $('#trayType').prop('disabled', false);
-
-        $('#trayCount').prop('disabled', false);
-    }
 
     calculateLineTotal();
 
@@ -195,9 +200,10 @@ function addProductRow()
         return;
     }
 
-    let selected    = $('#productSelect').find(':selected');
+    let selected = $('#productSelect').find(':selected');
     let productName = selected.data('name');
-    let unit        = selected.data('unit');
+    let unit = selected.data('unit');
+    let trayRequired = parseInt(selected.data('tray-required')) || 0;
 
     let quantity    = $('#quantity').val();
 
@@ -205,7 +211,7 @@ function addProductRow()
 
     let trayCount   = $('#trayCount').val();
         // Tray validation
-        if (unit.toLowerCase() !== 'box') {
+        if (trayRequired === 1) {
 
             if (!trayType || trayType === 'No Tray') {
                 toastr.error('Please select tray type');

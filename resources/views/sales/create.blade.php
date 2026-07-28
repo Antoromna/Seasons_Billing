@@ -124,7 +124,8 @@
                             <option value="{{ $product->id }}"
                                     data-name="{{ $product->name }}"
                                     data-unit="{{ $product->unit }}"
-                                    data-price="{{ $product->selling_price }}">
+                                    data-price="{{ $product->selling_price }}"
+                                    data-tray-required="{{ $product->tray_required }}">
                                 {{ $product->name }}
                             </option>
                         @endforeach
@@ -208,12 +209,12 @@
 
                     </div>
                     <div class="col-md-1">
-    <button type="button"
-            id="addProductBtn"
-            class="btn btn-success rounded-pill px-3 w-100 ms-5">
-        <i class="bi bi-cart-plus me-1"></i> Add
-    </button>
-</div>
+                        <button type="button"
+                                id="addProductBtn"
+                                class="btn btn-success rounded-pill px-3 w-100 ms-5">
+                            <i class="bi bi-cart-plus me-1"></i> Add
+                        </button>
+                    </div>
 
         </div>
 
@@ -235,7 +236,7 @@
             <div class="card-body p-0">
 
                 <div class="table-responsive table-scroll">
-    <table class="table align-middle mb-0" id="saleTable">
+                <table class="table align-middle mb-0" id="saleTable">
 
                         <thead class="table-light">
 

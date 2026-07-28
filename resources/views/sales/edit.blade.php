@@ -137,7 +137,8 @@
                             <option value="{{ $product->id }}"
                                     data-name="{{ $product->name }}"
                                     data-unit="{{ $product->unit }}"
-                                    data-price="{{ $product->selling_price }}">
+                                    data-price="{{ $product->selling_price }}"
+                                    data-tray-required="{{ $product->tray_required }}">
                                 {{ $product->name }}
                             </option>
                         @endforeach

@@ -9,7 +9,7 @@
             margin:0;
             padding:20px;
             background:#f5f5f5;
-            font-family:Arial, sans-serif;
+            font-family:"Times New Roman", serif;
             font-size:12px;
         }
         .section-total{
@@ -131,6 +131,17 @@
         }
 
         .item-row td{
+            padding:2px 4px;
+            line-height:14px;
+            height:auto;
+            border-left:1px solid #000;
+            border-right:1px solid #000;
+            border-top:none;
+            border-bottom:none;
+        }
+
+        .empty-row td{
+            height:30px;
             border-left:1px solid #000;
             border-right:1px solid #000;
             border-top:none;
@@ -149,22 +160,14 @@
 
         .balance-table .label{
             text-align:right;
-            width:65%;
         }
 
         .balance-table .colon{
-            width:10%;
             text-align:center;
         }
 
         .balance-table .amount{
-            width:25%;
             text-align:right;
-        }
-
-        .balance-table .net-row td{
-            border-top:1px solid #000 !important;
-            font-weight:bold;
         }
         .crate-table{
             width:100%;
@@ -254,7 +257,7 @@
                 <tr>
                     <td width="25%">
                         {{-- Logo --}}
-                        <img src="{{ asset('images/Seasons_Logo.png') }}" width="70">
+                        <img src="{{ asset('images/Seasons_Logo.png') }}" style="width:110px;height:auto;">
                     </td>
 
                     <td class="text-center">
@@ -284,7 +287,7 @@
             color:darkred;
             font-family:'Times New Roman', serif;
             font-weight:700;
-            font-size:16px;
+            font-size:22px;
             margin:8px 0;
             text-decoration:underline;
         ">
@@ -293,14 +296,14 @@
         <table class="no-border">
             <tr>
                 <td>
-                    <span style="font-size:16px;">Bill No :</span>
+                    <span style="font-size:14px;">Bill No :</span>
 
-                    <span style="font-size:16px; font-weight:700;">
+                    <span style="font-size:14px; font-weight:700;">
                         {{ $sale->bill_no }}
                     </span>
                 </td>
 
-                <td class="text-right" style="font-size:16px;">
+                <td class="text-right" style="font-size:14px;">
                     Date :
                     <span style="font-weight:700;">
                         {{ \Carbon\Carbon::parse($sale->bill_date)->format('d/m/Y') }}
@@ -309,11 +312,11 @@
             </tr>
 
             <tr>
-                <td colspan="2" style="font-size:16px;">
+                <td colspan="2" style="font-size:14px;padding-top:8px;">
                     To :
-                    <span style="font-weight:700;">
-                        {{ $sale->customer->name ?? '' }}
-                    </span>
+                                <span style="font-weight:700;">
+                                    {{ strtoupper($sale->customer->name ?? '') }}
+                                </span>
                 </td>
             </tr>
         </table>
@@ -352,23 +355,33 @@
 
                 <tr class="item-row">
                     <td>{{ $key + 1 }}</td>
-                    <td>{{ $item->product }}</td>
-                    <td>{{ $item->tray_qty }}</td>
-                    <td>{{ $item->quantity }}</td>
-                    <td>{{ number_format($item->price,2) }}</td>
-                    <td>{{ number_format($item->total,2) }}</td>
+                    <td>{{ strtoupper($item->product) }}</td>
+                    <td style="text-align:right;">{{ $item->tray_qty }}</td>
+                    <td style="text-align:right;">{{ number_format($item->quantity, 2) }}</td>
+                    <td style="text-align:right;">{{ number_format($item->price,2) }}</td>
+                    <td style="text-align:right;">{{ number_format($item->total,2) }}</td>
                 </tr>
 
                 @endforeach
+                @for($i = count($sale->items); $i < 6; $i++)
+                <tr class="empty-row">
+                    <td>&nbsp;</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                @endfor
 
-                <tr>
+                <tr style="font-weight:bold;">
                     <td colspan="2" style="text-align:right;">
                         <strong>Total</strong>
                     </td>
-                    <td>
+                    <td style="text-align:right;">
                         <strong>{{ $totalCrates }}</strong>
                     </td>
-                    <td>
+                    <td style="text-align:right;">
                         <strong>{{ $totalQty }}</strong>
                     </td>
                     <td colspan="2" style="text-align:right;">
@@ -414,7 +427,7 @@
             <table class="no-border" style="margin-top:5px;">
                 <tr>
 
-                    <td width="45%" valign="top">
+                    <td width="60%" valign="top">
 
                         <table class="crate-table">
                             <tr>
@@ -445,7 +458,7 @@
                         </td>
 
                         {{-- Right Side --}}
-                        <td width="55%" valign="top">
+                        <td width="40%" valign="top">
 
                 <table class="balance-table">
                     <tr>
@@ -464,28 +477,53 @@
                         </td>
                     </tr>
 
-                    <tr class="net-row">
-                        <td class="label"><strong>Net Balance</strong></td>
-                        <td class="colon"><strong>: ₹</strong></td>
-                        <td class="amount">
-                            <strong>{{ number_format($ledgerBalance,2) }}</strong>
-                        </td>
-                    </tr>
-                </table>
+                    </table>
+
+                    <div style="border-top:1px solid #000; margin:2px 0 2px 0;"></div>
+
+                    <table class="balance-table">
+                        <tr>
+                            <td class="label"><strong>Net Balance</strong></td>
+                            <td class="colon"><strong>: ₹</strong></td>
+                            <td class="amount">
+                                <strong>{{ number_format($ledgerBalance,2) }}</strong>
+                            </td>
+                        </tr>
+                    </table>
 
             </td>
 
             </tr>
         </table>
-        <div style="font-size:11px; font-family:Arial,sans-serif; margin:0;">
-        Bank Details                   : <strong>For SEASONS FRUITS TRADERS</strong> <br>
-        Bank Name / A/c No       : <strong>HDFC BANK / 50200028709842</strong> <br>
-        Branch / IFSC Code       : 
-        </div>
+       <table style="width:100%; border:none; font-size:13px; line-height:8px; margin-top:5px;">
+            <tr>
+                <td style="border:none; width:100px;">Bank Details</td>
+                <td style="border:none; width:10px;">:</td>
+                <td style="border:none;"><strong>For SEASONS FRUITS TRADERS</strong></td>
+            </tr>
+
+            <tr>
+                <td style="border:none;">Bank Name / A/c No</td>
+                <td style="border:none;">:</td>
+                <td style="border:none;"><strong>HDFC BANK / 50200028709842</strong></td>
+            </tr>
+
+            <tr>
+                <td style="border:none;">Branch / IFSC Code</td>
+                <td style="border:none;">:</td>
+                <td style="border:none;"><strong>Town Hall, Coimbatore / HDFC0001234</strong></td>
+            </tr>
+
+            <tr>
+                <td colspan="3" style="border:none; padding-top:8px;">
+                    E &amp; O.E
+                </td>
+            </tr>
+        </table>
         <br>
 
         <div style="text-align:right;">
-            <strong style=" color: darkred;font-size: small;">
+            <strong style="color:#8b0000;font-size:15px;">
                 For Seasons Fruits Traders
             </strong>
         </div>

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\TrayReturn;
 use App\Models\SaleItem;
+use App\Models\Sale;
 class TrayReturnController extends Controller
 {
     /**
@@ -160,40 +161,50 @@ class TrayReturnController extends Controller
         $entries = [];
 
         // Sales (Given)
-        $sales = SaleItem::with('sale')
-            ->whereHas('sale', function ($q) use ($customer) {
-                $q->where('customer_id', $customer->id);
-            })
-            ->where('tray_qty', '>', 0)
+        $sales = Sale::with('items')
+            ->where('customer_id', $customer->id)
             ->get();
 
-        foreach ($sales as $item) {
+        foreach ($sales as $sale) {
 
-            $entries[] = [
-                'type' => 'given',
-                'date' => $item->sale->bill_date,
-                'reference' => $item->sale->bill_no,
-                'tray_type' => $item->tray,
-                'qty' => $item->tray_qty,
-                'remarks' => 'Sale',
-            ];
+            $bigQty = $sale->items
+                ->where('tray', 'Big')
+                ->sum('tray_qty');
+
+            $smallQty = $sale->items
+                ->where('tray', 'Small')
+                ->sum('tray_qty');
+
+            if ($bigQty > 0 || $smallQty > 0) {
+
+                $entries[] = [
+                    'type' => 'given',
+                    'date' => $sale->bill_date,
+                    'reference' => $sale->bill_no,
+                    'big_given' => $bigQty,
+                    'small_given' => $smallQty,
+                    'remarks' => 'Sale',
+                ];
+            }
         }
 
-        // Returns
-        $returns = TrayReturn::where(
-            'customer_id',
-            $customer->id
-        )->get();
+                // Returns
+        $returns = TrayReturn::where('customer_id', $customer->id)
+            ->orderBy('return_date')
+            ->get()
+            ->groupBy('return_date');
 
-        foreach ($returns as $return) {
+        foreach ($returns as $date => $rows) {
+
+            $bigQty = $rows->where('tray_type', 'Big')->sum('tray_qty');
+            $smallQty = $rows->where('tray_type', 'Small')->sum('tray_qty');
 
             $entries[] = [
                 'type' => 'returned',
-                'date' => $return->return_date,
-                'reference' => 'Return #'.$return->id,
-                'tray_type' => $return->tray_type,
-                'qty' => $return->tray_qty,
-                'remarks' => $return->remarks,
+                'date' => $date,
+                'reference' => 'Return',
+                'big_returned' => $bigQty,
+                'small_returned' => $smallQty,
             ];
         }
 
@@ -203,7 +214,7 @@ class TrayReturnController extends Controller
 
         // Calculate running balances here
 
-        $bigBalance = 0;
+    $bigBalance = 0;
     $smallBalance = 0;
 
     $data = [];
@@ -215,26 +226,21 @@ class TrayReturnController extends Controller
         $smallGiven = 0;
         $smallReturned = 0;
 
-        if ($entry['tray_type'] == 'Big') {
+        if ($entry['type'] == 'given') {
 
-            if ($entry['type'] == 'given') {
-                $bigGiven = $entry['qty'];
-                $bigBalance += $entry['qty'];
-            } else {
-                $bigReturned = $entry['qty'];
-                $bigBalance -= $entry['qty'];
-            }
+            $bigGiven = $entry['big_given'];
+            $smallGiven = $entry['small_given'];
+
+            $bigBalance += $bigGiven;
+            $smallBalance += $smallGiven;
 
         } else {
 
-            if ($entry['type'] == 'given') {
-                $smallGiven = $entry['qty'];
-                $smallBalance += $entry['qty'];
-            } else {
-                $smallReturned = $entry['qty'];
-                $smallBalance -= $entry['qty'];
-            }
+            $bigReturned = $entry['big_returned'];
+        $smallReturned = $entry['small_returned'];
 
+        $bigBalance -= $bigReturned;
+        $smallBalance -= $smallReturned;
         }
 
         $data[] = [

@@ -160,10 +160,10 @@
 
             <div>
 
-                <strong>
+                {{-- <strong>
                     Total Amount :
                     ₹ {{ number_format($totalAmount, 2) }}
-                </strong>
+                </strong> --}}
 
             </div>
 
@@ -249,6 +249,25 @@
                     @endforelse
 
                 </tbody>
+                <tfoot>
+                    <tr class="table-light fw-bold">
+                        <td colspan="6" class="text-end">
+                            Total
+                        </td>
+
+                        <td>
+                            {{ number_format($totalQty, 2) }}
+                        </td>
+
+                        <td>
+                            ₹ {{ number_format($totalPrice, 2) }}
+                        </td>
+
+                        <td>
+                            ₹ {{ number_format($totalAmount, 2) }}
+                        </td>
+                    </tr>
+                </tfoot>
 
             </table>
             </div>

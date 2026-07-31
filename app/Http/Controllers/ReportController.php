@@ -44,12 +44,16 @@ public function productWise(Request $request)
     $items = $query->get();
 
     $totalAmount = (clone $query)->sum('total');
+    $totalQty = $items->sum('quantity');
+    $totalPrice = $items->sum('price');
 
     return view('reports.product-wise', compact(
         'items',
         'products',
         'customers',
-        'totalAmount'
+        'totalAmount',
+        'totalQty',
+        'totalPrice'
     ));
 }
 

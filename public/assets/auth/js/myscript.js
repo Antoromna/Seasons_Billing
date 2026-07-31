@@ -213,13 +213,10 @@ function addProductRow()
         // Tray validation
         if (trayRequired === 1) {
 
-            if (!trayType || trayType === 'No Tray') {
-                toastr.error('Please select tray type');
-                $('#trayType').focus();
-                return;
-            }
-
-            if (!trayCount || parseInt(trayCount) <= 0) {
+            trayType = $('#trayType').val() || 'No Tray';
+            trayCount = parseInt($('#trayCount').val()) || 0;
+            // Validate only when a tray type other than "No Tray" is selected
+            if (trayType !== 'No Tray' && trayCount <= 0) {
                 toastr.error('Please enter tray quantity');
                 $('#trayCount').focus();
                 return;

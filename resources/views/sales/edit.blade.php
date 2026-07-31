@@ -168,8 +168,7 @@
 
                         <input type="number"
                             id="quantity"
-                            class="form-control"
-                            value="1">
+                            class="form-control">
 
                     </div>
 

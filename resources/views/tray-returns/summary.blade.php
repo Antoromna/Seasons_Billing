@@ -18,7 +18,12 @@
             </div>
         </div>
         <div class="heading-actions">
-
+            <button type="button"
+                    class="btn btn-primary btn-sm"
+                    id="printTraySummary">
+                <i class="bi bi-printer"></i>
+                Print
+            </button>
             <a class="btn btn-primary btn-sm"
                 data-bs-toggle="modal"
                 data-bs-target="#trayReturnModal">
@@ -32,7 +37,7 @@
 
     </div>
 
-    <section class="panel mt-3">
+    <section class="panel mt-3" id="traySummaryPrint">
 
         <div class="panel-header">
 
@@ -56,7 +61,7 @@
                         <th>Big/Small [Given]</th>
                         <th>Big/Small [Returned]</th>
                         <th>Big/Small [Balance]</th>
-                        <th>Action</th>
+                        <th class="no-print">Action</th>
                     </tr>
                 </thead>
 
@@ -90,7 +95,7 @@
                                 </span>
                             </td>
 
-                            <td>
+                            <td class="no-print">
                                 <button
                                     class="btn btn-primary btn-sm trayLedger"
                                     data-id="{{ $row['customer']->id }}"
@@ -152,16 +157,25 @@
 </div>
 <div class="modal fade" id="trayLedgerModal">
     <div class="modal-dialog modal-xl">
-        <div class="modal-content">
+        <div class="modal-content" id="individualTrayLedgerPrint">
 
             <div class="modal-header">
                 <h5 class="modal-title">
                     Tray Ledger - <span id="tray_customer_name"></span>
                 </h5>
 
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"></button>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button"
+                            class="btn btn-primary btn-sm"
+                            id="printIndividualTrayLedger">
+                        <i class="bi bi-printer"></i>
+                        Print
+                    </button>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"></button>
+                </div>
             </div>
 
             <div class="modal-body">
@@ -303,4 +317,129 @@
         </div>
     </div>
 </div>
+
+<script>
+
+function printContent(title, content) {
+
+    const printWindow = window.open('', '_blank', 'width=1000,height=700');
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>${title}</title>
+
+            <style>
+                @page {
+                    size: A4 landscape;
+                    margin: 15mm;
+                }
+
+                body {
+                    font-family: Arial, sans-serif;
+                    color: #000;
+                    margin: 0;
+                    padding: 20px;
+                }
+
+                h2 {
+                    margin: 0 0 20px 0;
+                    font-size: 20px;
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+
+                th,
+                td {
+                    border: 1px solid #000;
+                    padding: 8px;
+                    text-align: left;
+                    color: #000;
+                }
+
+                th {
+                    font-weight: bold;
+                    background: #f2f2f2;
+                }
+            </style>
+        </head>
+
+        <body>
+
+            <h2>${title}</h2>
+
+            ${content}
+
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+
+    printWindow.focus();
+
+    setTimeout(function () {
+        printWindow.print();
+        printWindow.close();
+    }, 300);
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Overall Tray Ledger Print
+|--------------------------------------------------------------------------
+*/
+
+document.getElementById('printTraySummary').addEventListener('click', function () {
+
+    const table = document.querySelector(
+        '#traySummaryPrint table'
+    ).cloneNode(true);
+
+    // Remove Action column
+    table.querySelectorAll('tr').forEach(function (row) {
+
+        const cells = row.querySelectorAll('th, td');
+
+        // Remove Action column only from rows containing 6 columns
+        if (cells.length === 6) {
+            cells[cells.length - 1].remove();
+        }
+    });
+
+    printContent(
+        'Customer Tray Balance',
+        table.outerHTML
+    );
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Individual Customer Tray Ledger Print
+|--------------------------------------------------------------------------
+*/
+
+document.getElementById('printIndividualTrayLedger')
+    .addEventListener('click', function () {
+
+        const customerName =
+            document.getElementById('tray_customer_name').textContent.trim();
+
+        const table = document.querySelector(
+            '#individualTrayLedgerPrint table'
+        ).cloneNode(true);
+
+        printContent(
+            'Tray Ledger - ' + customerName,
+            table.outerHTML
+        );
+    });
+
+</script>
 @endsection

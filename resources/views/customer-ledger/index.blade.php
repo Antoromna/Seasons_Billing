@@ -137,11 +137,16 @@
                     <input type="date" id="to_date" class="form-control">
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-3">         
+                    <button type="button"
+                            id="printSimpleLedgerBtn"
+                            class="btn btn-success">
+                        Print
+                    </button>
                     <button type="button"
                             id="printLedgerBtn"
                             class="btn btn-primary">
-                        Print
+                        Print Items
                     </button>
                 </div>
             </div>
@@ -426,4 +431,99 @@
         </div>
     </div>
 </div>
+<script>
+
+document.getElementById('printSimpleLedgerBtn')
+    .addEventListener('click', function () {
+
+        const customerName =
+            document.getElementById('customer_name').textContent.trim();
+
+        const table = document.querySelector(
+            '#ledgerModal .modal-body table'
+        ).cloneNode(true);
+
+        const printWindow = window.open(
+            '',
+            '_blank',
+            'width=1000,height=700'
+        );
+
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+
+                <title>Customer Ledger - ${customerName}</title>
+
+                <style>
+
+                    @page {
+                        size: A4 landscape;
+                        margin: 15mm;
+                    }
+
+                    body {
+                        font-family: Arial, sans-serif;
+                        color: #000;
+                        margin: 0;
+                        padding: 20px;
+                    }
+
+                    h2 {
+                        margin-bottom: 20px;
+                        font-size: 20px;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+
+                    th,
+                    td {
+                        border: 1px solid #000;
+                        padding: 8px;
+                        text-align: left;
+                        color: #000;
+                    }
+
+                    th {
+                        font-weight: bold;
+                        background: #f2f2f2;
+                    }
+
+                    a {
+                        color: #000;
+                        text-decoration: none;
+                    }
+
+                </style>
+
+            </head>
+
+            <body>
+
+                <h2>
+                    Customer Ledger - ${customerName}
+                </h2>
+
+                ${table.outerHTML}
+
+            </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+
+        printWindow.focus();
+
+        setTimeout(function () {
+            printWindow.print();
+            printWindow.close();
+        }, 300);
+
+    });
+
+</script>
 @endsection

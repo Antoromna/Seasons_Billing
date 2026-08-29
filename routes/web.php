@@ -9,6 +9,7 @@ use App\Http\Controllers\CustomerLedgerController;
 use App\Http\Controllers\CustomerPaymentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TrayReturnController;
+use App\Http\Controllers\CashSaleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -79,3 +80,18 @@ Route::get('/customer-ledger/print', [CustomerLedgerController::class, 'print'])
     ->name('customer-ledger.print');
 Route::get('/customer-ledger/{customer}/print', [CustomerLedgerController::class, 'printLedger'])
     ->name('customer-ledger.print');
+
+Route::get('/cash-sales/create', [CashSaleController::class, 'create'])
+    ->name('cash_sales.create');
+
+Route::post('/cash-sales', [CashSaleController::class, 'store'])
+    ->name('cash_sales.store');
+
+Route::get('/cash-sales/{sale}/edit', [CashSaleController::class, 'edit'])
+    ->name('cash_sales.edit');
+
+Route::put('/cash-sales/{sale}', [CashSaleController::class, 'update'])
+    ->name('cash_sales.update');
+
+Route::delete('/cash-sales/{sale}', [CashSaleController::class, 'destroy'])
+    ->name('cash_sales.destroy');

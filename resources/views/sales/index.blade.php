@@ -82,30 +82,90 @@
     <section class="panel mt-3">
 
         <div class="panel-header">
-            
 
-            <div>
-                <h2 class="h5 mb-1 section-title">
-                    <i class="bi bi-table"></i>
-                    <span>Sales List</span>
-                </h2>
-            </div>
-            <div>
-                <button type="button"
-                        class="btn btn-primary"
-                        id="bulkPrintBtn">
-                    Bulk Print
-                </button>
-                <a class="btn btn-primary btn-bg"
-                    href="{{ route('sales.create') }}">
+    <div>
+        <h2 class="h5 mb-1 section-title">
+            <i class="bi bi-table"></i>
+            <span>Sales List</span>
+        </h2>
+    </div>
 
-                        <i class="bi bi-plus-circle"></i>
-                        Create Sale
+    <div class="d-flex align-items-center gap-2">
 
-                </a>
-            </div>
+        {{-- Bill Type Toggle --}}
+        <div class="btn-group" role="group">
+
+            <input type="radio"
+                   class="btn-check"
+                   name="bill_type"
+                   id="billTypeAll"
+                   value=""
+                   {{ request('bill_type', '') == '' ? 'checked' : '' }}>
+
+            <label class="btn btn-outline-primary"
+                   for="billTypeAll">
+                All
+            </label>
+
+
+            <input type="radio"
+                   class="btn-check"
+                   name="bill_type"
+                   id="billTypeCash"
+                   value="cash"
+                   {{ request('bill_type') == 'cash' ? 'checked' : '' }}>
+
+            <label class="btn btn-outline-success"
+                   for="billTypeCash">
+                Cash
+            </label>
+
+
+            <input type="radio"
+                   class="btn-check"
+                   name="bill_type"
+                   id="billTypeCredit"
+                   value="credit"
+                   {{ request('bill_type') == 'credit' ? 'checked' : '' }}>
+
+            <label class="btn btn-outline-warning"
+                   for="billTypeCredit">
+                Credit
+            </label>
 
         </div>
+
+
+        {{-- Bulk Print --}}
+        <button type="button"
+                class="btn btn-primary"
+                id="bulkPrintBtn">
+            Bulk Print
+        </button>
+
+
+        {{-- Create Sale --}}
+        <a class="btn btn-primary btn-bg"
+           href="{{ route('sales.create') }}">
+
+            <i class="bi bi-plus-circle"></i>
+            DC Sale
+
+        </a>
+
+
+        {{-- Create Cash Sale --}}
+        <a class="btn btn-primary btn-bg"
+           href="{{ route('cash_sales.create') }}">
+
+            <i class="bi bi-plus-circle"></i>
+             Cash Sale
+
+        </a>
+
+    </div>
+
+</div>
         
 
         <div class="table-responsive">
@@ -166,11 +226,23 @@
 
                            <div class="d-flex justify-content-end gap-2">
 
-                                <a href="{{ route('sales.edit', $sale->id) }}"
-                                class="btn btn-primary btn-sm"
-                                title="Edit">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
+                                @if($sale->bill_type === 'cash')
+
+                                    <a href="{{ route('cash_sales.edit', $sale->id) }}"
+                                    class="btn btn-primary btn-sm"
+                                    title="Edit">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+
+                                @else
+
+                                    <a href="{{ route('sales.edit', $sale->id) }}"
+                                    class="btn btn-primary btn-sm"
+                                    title="Edit">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+
+                                @endif
 
                                 <a href="{{ route('sales.print', $sale->id) }}"
                                 target="_blank"
@@ -225,8 +297,10 @@
                                                 Cancel
                                             </button>
 
-                                            <form action="{{ route('sales.destroy', $sale->id) }}"
-                                                  method="POST">
+                                            <form action="{{ $sale->bill_type === 'cash'
+                                                                ? route('cash_sales.destroy', $sale->id)
+                                                                : route('sales.destroy', $sale->id) }}"
+                                                method="POST">
 
                                                 @csrf
                                                 @method('DELETE')
@@ -269,6 +343,25 @@
     </section>
 
 </div>
+<script>
+document.querySelectorAll('input[name="bill_type"]').forEach(function (radio) {
 
+    radio.addEventListener('change', function () {
+
+        const url = new URL(window.location.href);
+
+        if (this.value) {
+            url.searchParams.set('bill_type', this.value);
+        } else {
+            url.searchParams.delete('bill_type');
+        }
+
+        url.searchParams.delete('page');
+
+        window.location.href = url.toString();
+    });
+
+});
+</script>
 
 @endsection

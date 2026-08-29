@@ -14,46 +14,54 @@ use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
 {
-public function index(Request $request)
-{
-    $query = Sale::with('customer');
+ public function index(Request $request)
+    {
+        $query = Sale::with('customer');
 
-    if ($request->filled('from_date')) {
-        $query->whereDate(
-            'bill_date',
-            '>=',
-            $request->from_date
+        if ($request->filled('from_date')) {
+            $query->whereDate(
+                'bill_date',
+                '>=',
+                $request->from_date
+            );
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate(
+                'bill_date',
+                '<=',
+                $request->to_date
+            );
+        }
+
+        if ($request->filled('customer_id')) {
+            $query->where(
+                'customer_id',
+                $request->customer_id
+            );
+        }
+
+        // Bill Type Filter
+        if ($request->filled('bill_type')) {
+            $query->where(
+                'bill_type',
+                $request->bill_type
+            );
+        }
+
+        $sales = $query
+            ->latest()
+            ->get();
+
+        $customers = Customer::where('status', 1)
+            ->orderBy('name')
+            ->get();
+
+        return view(
+            'sales.index',
+            compact('sales', 'customers')
         );
     }
-
-    if ($request->filled('to_date')) {
-        $query->whereDate(
-            'bill_date',
-            '<=',
-            $request->to_date
-        );
-    }
-
-    if ($request->filled('customer_id')) {
-        $query->where(
-            'customer_id',
-            $request->customer_id
-        );
-    }
-
-    $sales = $query
-        ->latest()
-        ->get();
-
-    $customers = Customer::where('status',1)
-        ->orderBy('name')
-        ->get();
-
-    return view(
-        'sales.index',
-        compact('sales','customers')
-    );
-}  
 public function create()
 {
     $customers = Customer::where('status', 1)->orderBy('name')->get();

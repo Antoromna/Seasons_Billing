@@ -101,15 +101,22 @@ $('#productSelect').on('change', function () {
 
     if (trayRequired === 0) {
 
-        $('#trayType').val('No Tray').prop('disabled', true);
-        $('#trayCount').val(0).prop('disabled', true);
+    $('#trayType')
+        .val('No Tray')
+        .prop('disabled', true);
 
-    } else {
+    $('#trayCount')
+        .val(0)
+        .prop('disabled', true);
 
-        $('#trayType').prop('disabled', false);
-        $('#trayCount').prop('disabled', false);
+} else {
 
-    }
+    $('#trayType')
+        .prop('disabled', false);
+
+    // Enable/disable count based on selected tray type
+    updateTrayCountState();
+}
 
     let unit = selected.data('unit') || '';
 
@@ -119,6 +126,28 @@ $('#productSelect').on('change', function () {
     calculateLineTotal();
 
     $('#quantity').focus();
+});
+function updateTrayCountState()
+{
+    let trayType = $('#trayType').val();
+
+    if (trayType === 'No Tray') {
+
+        $('#trayCount')
+            .val(0)
+            .prop('disabled', true);
+
+    } else {
+
+        $('#trayCount')
+            .prop('disabled', false);
+
+    }
+}
+$('#trayType').on('change', function () {
+
+    updateTrayCountState();
+
 });
 $('#productSelect').on('focus', function () {
 
@@ -748,6 +777,7 @@ function printProductReport() {
 }
 //sale-previous balance
 $(document).ready(function () {
+     updateTrayCountState();
 
     $('#customer_id').change(function () {
 

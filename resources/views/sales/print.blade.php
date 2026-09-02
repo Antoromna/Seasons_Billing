@@ -16,30 +16,30 @@
             text-align: end;
         }
         .invoice{
-            width:420px;
+            width:500px;
             margin:0 auto;
             background:#fff;
-            border:1px solid #000;
-            padding:10px;
+            padding:25px;
         }
-        
+        .print_header{
+            font-size: 14px !important;
+        }
         .company{
-            font-size:18px;
+            font-size:20px;
             font-weight:700;
             color:#5b2c2c; /* dark maroon */
-            letter-spacing:1px;
             margin-bottom:2px;
         }
 
         .subtitle{
-            font-size:13px;
+            font-size:15px;
             font-weight:600;
             color:#222;
             margin-bottom:2px;
         }
 
         .address{
-            font-size:12px;
+            font-size:15px;
             font-weight:600;
             color:#333;
             line-height:1.2;
@@ -47,7 +47,7 @@
         }
 
         .phone{
-            font-size:12px;
+            font-size:15px;
             font-weight:700;
             color:#333;
         }
@@ -65,10 +65,7 @@
             margin-bottom:5px;
         }
 
-        .company{
-            font-size:18px;
-            font-weight:bold;
-        }
+        
 
         .small{
             font-size:11px;
@@ -83,7 +80,6 @@
         table td{
             border:1px solid #000;
             padding:4px;
-            font-size:11px;
         }
 
         .no-border td{
@@ -131,11 +127,7 @@
         }
 
         .item-row td{
-            padding:2px 4px;
-            line-height:14px;
-            height:auto;
-            border-left:1px solid #000;
-            border-right:1px solid #000;
+            padding:4px 4px;
             border-top:none;
             border-bottom:none;
         }
@@ -154,8 +146,8 @@
 
         .balance-table td{
             border:none !important;
-            padding:2px 4px;
-            font-size:11px;
+            padding:2px 12px;
+            font-size:16px;
         }
 
         .balance-table .label{
@@ -202,7 +194,6 @@
             }
 
             .invoice{
-                border:1px solid #000;
                 margin:0 auto;
             }
 
@@ -275,7 +266,7 @@
                         </div>
 
                         <div class="phone">
-                            PH : 8144008056 , 8144008056
+                            PH : 9566221566 , 8144008056
                         </div>
                     </td>
                 </tr>
@@ -293,40 +284,44 @@
         ">
             INVOICE
         </h3>
-        <table class="no-border">
-            <tr>
-                <td>
-                    <span style="font-size:14px;">Bill No :</span>
+        <table class="no-border" style="width:100%;">
+    <tr>
+        <td style="font-size:18px;">
+            <span style="font-size:18px;">Bill No :</span>
+            <span style="font-size:18px; font-weight:700;">
+                {{ $sale->bill_no }}
+            </span>
+        </td>
 
-                    <span style="font-size:14px; font-weight:700;">
-                        {{ $sale->bill_no }}
-                    </span>
-                </td>
+        <td class="text-right" style="font-size:18px;">
+            Date :
+            <span style="font-weight:700;">
+                {{ \Carbon\Carbon::parse($sale->bill_date)->format('d/m/Y') }}
+            </span>
+        </td>
+    </tr>
 
-                <td class="text-right" style="font-size:14px;">
-                    Date :
-                    <span style="font-weight:700;">
-                        {{ \Carbon\Carbon::parse($sale->bill_date)->format('d/m/Y') }}
-                    </span>
-                </td>
-            </tr>
+    <tr>
+        <td colspan="2" style="padding-top:8px; font-size:18px;">
+            <span style="display:inline-block; width:55px;">
+                To
+            </span>
+            :
+            <span style="font-weight:700; margin-left:5px;">
+                {{ $sale->customer->name ?? '' }}
+            </span>
 
-            <tr>
-                <td colspan="2" style="font-size:14px;padding-top:8px;">
-                    To :
-                                <span style="font-weight:700;">
-                                    {{ strtoupper($sale->customer->name ?? '') }}
-                                </span>
-                </td>
-            </tr>
-        </table>
+          
+        </td>
+    </tr>
+</table>
 
         <br>
 
         <table>
 
             <thead>
-                <tr>
+                <tr class="print_header">
                     <th>S.No</th>
                     <th>Particulars</th>
                     <th>Crates</th>
@@ -336,7 +331,7 @@
                 </tr>
             </thead>
 
-            <tbody>
+            <tbody style="font-size: 15px;">
 
                 @foreach($sale->items as $key => $item)
 
@@ -354,9 +349,9 @@
                 @endphp
 
                 <tr class="item-row">
-                    <td>{{ $key + 1 }}</td>
+                    <td  style="text-align: center;">{{ $key + 1 }}</td>
                     <td>{{ strtoupper($item->product) }}</td>
-                    <td style="text-align:right;">{{ $item->tray_qty }}</td>
+                    <td style="text-align:right;text-align: center;">{{ $item->tray_qty }}</td>
                     <td style="text-align:right;">{{ number_format($item->quantity, 2) }}</td>
                     <td style="text-align:right;">{{ number_format($item->price,2) }}</td>
                     <td style="text-align:right;">{{ number_format($item->total,2) }}</td>
@@ -427,9 +422,9 @@
             <table class="no-border" style="margin-top:5px;">
                 <tr>
 
-                    <td width="60%" valign="top">
+                    <td width="45%" valign="top">
 
-                        <table class="crate-table">
+                        <table class="crate-table" style="font-size: 14px;">
                             <tr>
                     <th>Crates</th>
                     <th>B</th>
@@ -438,27 +433,27 @@
 
                 <tr>
                     <td>Pre Balance</td>
-                    <td>{{ $sale->previousBigBalance }}</td>
-                    <td>{{ $sale->previousSmallBalance }}</td>
+                    <td style="text-align: end;">{{ $sale->previousBigBalance }}</td>
+                    <td style="text-align: end;">{{ $sale->previousSmallBalance }}</td>
                 </tr>
 
                 <tr>
                     <td>Todays Sales</td>
-                    <td>{{ $sale->bigCrates }}</td>
-                    <td>{{ $sale->smallCrates }}</td>
+                    <td style="text-align: end;">{{ $sale->bigCrates }}</td>
+                    <td style="text-align: end;">{{ $sale->smallCrates }}</td>
                 </tr>
 
                 <tr>
                     <td>Balance</td>
-                    <td>{{ $sale->currentBigBalance }}</td>
-                    <td>{{ $sale->currentSmallBalance }}</td>
+                    <td style="text-align: end;">{{ $sale->currentBigBalance }}</td>
+                    <td style="text-align: end;">{{ $sale->currentSmallBalance }}</td>
                 </tr>
                             </table>
 
                         </td>
 
                         {{-- Right Side --}}
-                        <td width="40%" valign="top">
+                        <td width="55%" valign="top">
 
                 <table class="balance-table">
                     <tr>
@@ -479,7 +474,7 @@
 
                     </table>
 
-                    <div style="border-top:1px solid #000; margin:2px 0 2px 0;"></div>
+                    <div style="border-top:2px solid #4b8beb; margin:2px 0 2px 15px;"></div>
 
                     <table class="balance-table">
                         <tr>
@@ -490,6 +485,7 @@
                             </td>
                         </tr>
                     </table>
+                    <div style="border-top:2px solid #4b8beb; margin:2px 0 2px 15px;"></div>
 
             </td>
 
@@ -497,7 +493,7 @@
         </table>
        <table style="width:100%; border:none; font-size:13px; line-height:8px; margin-top:5px;">
             <tr>
-                <td style="border:none; width:100px;">Bank Details</td>
+                <td style="border:none; width:115px;">Bank Details</td>
                 <td style="border:none; width:10px;">:</td>
                 <td style="border:none;"><strong>For SEASONS FRUITS TRADERS</strong></td>
             </tr>
@@ -511,22 +507,30 @@
             <tr>
                 <td style="border:none;">Branch / IFSC Code</td>
                 <td style="border:none;">:</td>
-                <td style="border:none;"><strong>Town Hall, Coimbatore / HDFC0001234</strong></td>
+                <td style="border:none;"><strong>VYSIAL STREET / HDFC0005194</strong></td>
             </tr>
 
             <tr>
-                <td colspan="3" style="border:none; padding-top:8px;">
-                    E &amp; O.E
-                </td>
-            </tr>
-        </table>
-        <br>
+            <td colspan="3" style="border:none;">
+                <table style="width:100%; border:none;">
+                    <tr>
+                        <td style="border:none; text-align:left;">
+                            E &amp; O.E
+                        </td>
 
-        <div style="text-align:right;">
-            <strong style="color:#8b0000;font-size:15px;">
-                For Seasons Fruits Traders
-            </strong>
-        </div>
+                        <td style="border:none; text-align:right;">
+                            <strong style="color:#8b0000; font-size:15px;">
+                                For Seasons Fruits Traders
+                            </strong>
+                        </td>
+                    </tr>
+                </table>
+                
+            </td>
+        </tr>
+        </table>
+        <div style="border-top:2px solid #4b8beb; margin-top:3px;"></div>
+        
 
     </div>
     @if(!$loop->last)

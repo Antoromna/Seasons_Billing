@@ -17,14 +17,34 @@
                 </h1>
             </div>
         </div>
-        <div class="heading-actions">
+        <div class="heading-actions d-flex align-items-center gap-3">
+
+            <div class="tray-filter">
+                <a href="{{ request()->fullUrlWithQuery(['balance_filter' => 'all']) }}"
+                class="tray-filter-btn {{ request('balance_filter', 'all') === 'all' ? 'active' : '' }}">
+                    All
+                </a>
+
+                <a href="{{ request()->fullUrlWithQuery(['balance_filter' => 'with_balance']) }}"
+                class="tray-filter-btn {{ request('balance_filter') === 'with_balance' ? 'active' : '' }}">
+                    <i class="bi bi-check-circle"></i>
+                    With Balance
+                </a>
+
+                <a href="{{ request()->fullUrlWithQuery(['balance_filter' => 'without_balance']) }}"
+                class="tray-filter-btn {{ request('balance_filter') === 'without_balance' ? 'active' : '' }}">
+                    <i class="bi bi-dash-circle"></i>
+                    No Balance
+                </a>
+            </div>
+
             <button type="button"
-                    class="btn btn-primary btn-sm"
+                    class="btn btn-primary btn-sm tray-print-btn"
                     id="printTraySummary">
-                <i class="bi bi-printer"></i>
+                <i class="bi bi-printer me-1"></i>
                 Print
             </button>
-            
+
 
         </div>
 

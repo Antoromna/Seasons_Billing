@@ -235,6 +235,23 @@ class TrayReturnController extends Controller
             ];
         });
 
+        $filter = request('balance_filter', 'all');
+
+        if ($filter === 'with_balance') {
+
+            $summary = $summary->filter(function ($row) {
+                return $row['big_balance'] > 0
+                    || $row['small_balance'] > 0;
+            });
+
+        } elseif ($filter === 'without_balance') {
+
+            $summary = $summary->filter(function ($row) {
+                return $row['big_balance'] == 0
+                    && $row['small_balance'] == 0;
+            });
+        }
+
         return view(
         'tray-returns.summary',
         compact('summary', 'customers')

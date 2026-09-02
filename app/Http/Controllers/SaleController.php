@@ -218,11 +218,13 @@ public function print($id)
 
     // Previous returns (before this bill)
     $previousBigReturns = TrayReturn::where('customer_id', $sale->customer_id)
+        ->where('transaction_type', 'returned')
         ->where('tray_type', 'Big')
         ->where('return_date', '<', $sale->bill_date)
         ->sum('tray_qty');
 
     $previousSmallReturns = TrayReturn::where('customer_id', $sale->customer_id)
+        ->where('transaction_type', 'returned')
         ->where('tray_type', 'Small')
         ->where('return_date', '<', $sale->bill_date)
         ->sum('tray_qty');

@@ -48,6 +48,7 @@ class TrayReturnController extends Controller
 
         TrayReturn::create([
             'customer_id' => $request->customer_id,
+            'transaction_type'=> 'returned',
             'return_date' => $request->return_date,
             'tray_type'   => 'Big',
             'tray_qty'    => $request->big_qty,
@@ -59,6 +60,7 @@ class TrayReturnController extends Controller
 
         TrayReturn::create([
             'customer_id' => $request->customer_id,
+            'transaction_type'=> 'returned',
             'return_date' => $request->return_date,
             'tray_type'   => 'Small',
             'tray_qty'    => $request->small_qty,
@@ -69,6 +71,50 @@ class TrayReturnController extends Controller
     return redirect()
         ->route('tray-returns.summary')
         ->with('success', 'Tray Return Added Successfully');
+    }
+    public function give(Request $request)
+    {
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'give_date'   => 'required|date',
+            'big_qty'     => 'nullable|integer|min:0',
+            'small_qty'  => 'nullable|integer|min:0',
+            'remarks'     => 'nullable|string|max:255',
+        ]);
+
+        $bigQty = (int) $request->big_qty;
+        $smallQty = (int) $request->small_qty;
+
+        if ($bigQty <= 0 && $smallQty <= 0) {
+            return back()
+                ->with('error', 'Enter at least one tray quantity.');
+        }
+
+        if ($bigQty > 0) {
+
+            TrayReturn::create([
+                'customer_id'      => $request->customer_id,
+                'transaction_type' => 'given',
+                'return_date'      => $request->give_date,
+                'tray_type'        => 'Big',
+                'tray_qty'         => $bigQty,
+                'remarks'          => $request->remarks,
+            ]);
+        }
+
+        if ($smallQty > 0) {
+
+            TrayReturn::create([
+                'customer_id'      => $request->customer_id,
+                'transaction_type' => 'given',
+                'return_date'      => $request->give_date,
+                'tray_type'        => 'Small',
+                'tray_qty'         => $smallQty,
+                'remarks'          => $request->remarks,
+            ]);
+        }
+
+        return back()->with('success', 'Tray given successfully.');
     }
 
     /**
@@ -108,32 +154,84 @@ class TrayReturnController extends Controller
 
         $summary = $customers->map(function ($customer) {
 
-            $bigGiven = \App\Models\SaleItem::join('sales', 'sales.id', '=', 'sale_items.sale_id')
+            // -----------------------------------------
+            // DC SALE - TRAYS GIVEN
+            // -----------------------------------------
+
+            $bigSaleGiven = SaleItem::join(
+                    'sales',
+                    'sales.id',
+                    '=',
+                    'sale_items.sale_id'
+                )
                 ->where('sales.customer_id', $customer->id)
                 ->where('sale_items.tray', 'Big')
                 ->sum('sale_items.tray_qty');
 
-            $smallGiven = \App\Models\SaleItem::join('sales', 'sales.id', '=', 'sale_items.sale_id')
+            $smallSaleGiven = SaleItem::join(
+                    'sales',
+                    'sales.id',
+                    '=',
+                    'sale_items.sale_id'
+                )
                 ->where('sales.customer_id', $customer->id)
                 ->where('sale_items.tray', 'Small')
                 ->sum('sale_items.tray_qty');
 
-            $bigReturned = \App\Models\TrayReturn::where('customer_id', $customer->id)
+
+            // -----------------------------------------
+            // MANUAL TRAYS GIVEN
+            // -----------------------------------------
+
+            $bigManualGiven = TrayReturn::where('customer_id', $customer->id)
+                ->where('transaction_type', 'given')
                 ->where('tray_type', 'Big')
                 ->sum('tray_qty');
 
-            $smallReturned = \App\Models\TrayReturn::where('customer_id', $customer->id)
+            $smallManualGiven = TrayReturn::where('customer_id', $customer->id)
+                ->where('transaction_type', 'given')
                 ->where('tray_type', 'Small')
                 ->sum('tray_qty');
 
+
+            // -----------------------------------------
+            // TRAYS RETURNED
+            // -----------------------------------------
+
+            $bigReturned = TrayReturn::where('customer_id', $customer->id)
+                ->where('transaction_type', 'returned')
+                ->where('tray_type', 'Big')
+                ->sum('tray_qty');
+
+            $smallReturned = TrayReturn::where('customer_id', $customer->id)
+                ->where('transaction_type', 'returned')
+                ->where('tray_type', 'Small')
+                ->sum('tray_qty');
+
+
+            // -----------------------------------------
+            // TOTAL GIVEN
+            // -----------------------------------------
+
+            $bigGiven = $bigSaleGiven + $bigManualGiven;
+
+            $smallGiven = $smallSaleGiven + $smallManualGiven;
+
+
+            // -----------------------------------------
+            // BALANCE
+            // -----------------------------------------
+
             return [
-                'customer'       => $customer,
-                'big_given'      => $bigGiven,
-                'big_returned'   => $bigReturned,
-                'big_balance'    => $bigGiven - $bigReturned,
-                'small_given'    => $smallGiven,
+                'customer' => $customer,
+
+                'big_given' => $bigGiven,
+                'big_returned' => $bigReturned,
+                'big_balance' => $bigGiven - $bigReturned,
+
+                'small_given' => $smallGiven,
                 'small_returned' => $smallReturned,
-                'small_balance'  => $smallGiven - $smallReturned,
+                'small_balance' => $smallGiven - $smallReturned,
             ];
         });
 
@@ -160,7 +258,11 @@ class TrayReturnController extends Controller
     {
         $entries = [];
 
-        // Sales (Given)
+        /*
+        |--------------------------------------------------------------------------
+        | Sales (Given)
+        |--------------------------------------------------------------------------
+        */
         $sales = Sale::with('items')
             ->where('customer_id', $customer->id)
             ->get();
@@ -181,82 +283,126 @@ class TrayReturnController extends Controller
                     'type' => 'given',
                     'date' => $sale->bill_date,
                     'reference' => $sale->bill_no,
+
                     'big_given' => $bigQty,
                     'small_given' => $smallQty,
+
+                    'big_returned' => 0,
+                    'small_returned' => 0,
+
                     'remarks' => 'Sale',
                 ];
             }
         }
 
-                // Returns
-        $returns = TrayReturn::where('customer_id', $customer->id)
+
+        /*
+        |--------------------------------------------------------------------------
+        | Tray Transactions (Given / Returned)
+        |--------------------------------------------------------------------------
+        */
+        $trayTransactions = TrayReturn::where('customer_id', $customer->id)
             ->orderBy('return_date')
-            ->get()
-            ->groupBy('return_date');
+            ->get();
 
-        foreach ($returns as $date => $rows) {
+        foreach ($trayTransactions as $transaction) {
 
-            $bigQty = $rows->where('tray_type', 'Big')->sum('tray_qty');
-            $smallQty = $rows->where('tray_type', 'Small')->sum('tray_qty');
+            $bigQty = $transaction->tray_type === 'Big'
+                ? $transaction->tray_qty
+                : 0;
 
-            $entries[] = [
-                'type' => 'returned',
-                'date' => $date,
-                'reference' => 'Return',
-                'big_returned' => $bigQty,
-                'small_returned' => $smallQty,
-            ];
+            $smallQty = $transaction->tray_type === 'Small'
+                ? $transaction->tray_qty
+                : 0;
+
+
+            if ($transaction->transaction_type === 'given') {
+
+                $entries[] = [
+                    'type' => 'given',
+                    'date' => $transaction->return_date,
+                    'reference' => 'Given',
+
+                    'big_given' => $bigQty,
+                    'small_given' => $smallQty,
+
+                    'big_returned' => 0,
+                    'small_returned' => 0,
+
+                    'remarks' => $transaction->remarks ?? 'Given',
+                ];
+
+            } else {
+
+                $entries[] = [
+                    'type' => 'returned',
+                    'date' => $transaction->return_date,
+                    'reference' => 'Return',
+
+                    'big_given' => 0,
+                    'small_given' => 0,
+
+                    'big_returned' => $bigQty,
+                    'small_returned' => $smallQty,
+
+                    'remarks' => $transaction->remarks ?? 'Return',
+                ];
+            }
         }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sort by Date
+        |--------------------------------------------------------------------------
+        */
         usort($entries, function ($a, $b) {
             return strtotime($a['date']) <=> strtotime($b['date']);
         });
 
-        // Calculate running balances here
 
-    $bigBalance = 0;
-    $smallBalance = 0;
+        /*
+        |--------------------------------------------------------------------------
+        | Running Balance
+        |--------------------------------------------------------------------------
+        */
+        $bigBalance = 0;
+        $smallBalance = 0;
 
-    $data = [];
+        $data = [];
 
-    foreach ($entries as $entry) {
+        foreach ($entries as $entry) {
 
-        $bigGiven = 0;
-        $bigReturned = 0;
-        $smallGiven = 0;
-        $smallReturned = 0;
+            $bigGiven = $entry['big_given'] ?? 0;
+            $bigReturned = $entry['big_returned'] ?? 0;
 
-        if ($entry['type'] == 'given') {
+            $smallGiven = $entry['small_given'] ?? 0;
+            $smallReturned = $entry['small_returned'] ?? 0;
 
-            $bigGiven = $entry['big_given'];
-            $smallGiven = $entry['small_given'];
-
+            // Given increases balance
             $bigBalance += $bigGiven;
             $smallBalance += $smallGiven;
 
-        } else {
+            // Returned decreases balance
+            $bigBalance -= $bigReturned;
+            $smallBalance -= $smallReturned;
 
-            $bigReturned = $entry['big_returned'];
-        $smallReturned = $entry['small_returned'];
+            $data[] = [
+                'date' => $entry['date'],
+                'reference' => $entry['reference'],
 
-        $bigBalance -= $bigReturned;
-        $smallBalance -= $smallReturned;
+                'big_given' => $bigGiven,
+                'big_returned' => $bigReturned,
+                'big_balance' => $bigBalance,
+
+                'small_given' => $smallGiven,
+                'small_returned' => $smallReturned,
+                'small_balance' => $smallBalance,
+
+                'remarks' => $entry['remarks'] ?? '',
+            ];
         }
 
-        $data[] = [
-            'date' => $entry['date'],
-            'reference' => $entry['reference'],
-
-            'big_given' => $bigGiven,
-            'big_returned' => $bigReturned,
-            'big_balance' => $bigBalance,
-
-            'small_given' => $smallGiven,
-            'small_returned' => $smallReturned,
-            'small_balance' => $smallBalance,
-        ];
-    }
-
-    return response()->json($data);
+        return response()->json($data);
     }
 }

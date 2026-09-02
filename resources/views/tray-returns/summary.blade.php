@@ -24,14 +24,7 @@
                 <i class="bi bi-printer"></i>
                 Print
             </button>
-            <a class="btn btn-primary btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#trayReturnModal">
-
-                    <i class="bi bi-plus-circle"></i>
-                    Add Return
-
-            </a>
+            
 
         </div>
 
@@ -58,8 +51,6 @@
                     <tr>
                         <th>S.No</th>
                         <th>Customer</th>
-                        <th>Big/Small [Given]</th>
-                        <th>Big/Small [Returned]</th>
                         <th>Big/Small [Balance]</th>
                         <th class="no-print">Action</th>
                     </tr>
@@ -77,15 +68,7 @@
                                 {{ $row['customer']->name }}
                             </td>
 
-                            <td>
-                                {{ $row['big_given'] }} / {{ $row['small_given'] }}
-                            </td>
-
-                            <td>
-                                {{ $row['big_returned'] }} / {{ $row['small_returned'] }}
-                            </td>
-
-                            <td>
+                           <td>
                                 <span class="badge text-bg-primary">
                                     {{ $row['big_balance'] }}
                                 </span>
@@ -96,12 +79,49 @@
                             </td>
 
                             <td class="no-print">
-                                <button
-                                    class="btn btn-primary btn-sm trayLedger"
-                                    data-id="{{ $row['customer']->id }}"
-                                    data-name="{{ $row['customer']->name }}">
-                                    View Ledger
-                                </button>
+
+                                <div class="d-flex gap-1">
+
+                                    {{-- Return Tray --}}
+                                    <button
+                                        type="button"
+                                        class="btn btn-success btn-sm returnTrayBtn"
+                                        data-id="{{ $row['customer']->id }}"
+                                        data-name="{{ $row['customer']->name }}">
+
+                                        <i class="bi bi-arrow-return-left"></i>
+                                        Return Tray
+
+                                    </button>
+
+
+                                    {{-- Give Tray --}}
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary btn-sm giveTrayBtn"
+                                        data-id="{{ $row['customer']->id }}"
+                                        data-name="{{ $row['customer']->name }}">
+
+                                        <i class="bi bi-box-seam"></i>
+                                        Give Tray
+
+                                    </button>
+
+
+                                    {{-- View Ledger --}}
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary btn-sm trayLedger"
+                                        data-id="{{ $row['customer']->id }}"
+                                        data-name="{{ $row['customer']->name }}">
+
+                                        <i class="bi bi-eye"></i>
+                                        Ledger
+
+                                    </button>
+
+                                </div>
+
                             </td>
 
                         </tr>
@@ -124,18 +144,6 @@
                         <tr class="fw-bold">
                             <td colspan="2">
                                 Grand Total
-                            </td>
-
-                            <td>
-                                {{ $summary->sum('big_given') }}
-                                /
-                                {{ $summary->sum('small_given') }}
-                            </td>
-
-                            <td>
-                                {{ $summary->sum('big_returned') }}
-                                /
-                                {{ $summary->sum('small_returned') }}
                             </td>
 
                             <td>
@@ -225,27 +233,9 @@
 
                     <div class="row">
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">
-                                Customer
-                            </label>
-
-                            <select name="customer_id"
-                                    class="form-select"
-                                    required>
-
-                                <option value="">
-                                    Select Customer
-                                </option>
-
-                                @foreach($customers as $customer)
-                                    <option value="{{ $customer->id }}">
-                                        {{ $customer->name }}
-                                    </option>
-                                @endforeach
-
-                            </select>
-                        </div>
+                       <input type="hidden"
+                        name="customer_id"
+                        id="return_customer_id">
 
                         <div class="col-md-4 mb-3">
                             <label class="form-label">
@@ -316,6 +306,158 @@
 
         </div>
     </div>
+</div>
+{{-- Give Tray Modal --}}
+<div class="modal fade" id="trayGiveModal">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <form method="POST"
+                  action="{{ route('tray-gives.store') }}">
+
+                @csrf
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Give Tray
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+
+                        {{-- Customer --}}
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Customer
+                            </label>
+
+                            <select name="customer_id"
+                                    id="give_customer_id"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Select Customer
+                                </option>
+
+                                @foreach($customers as $customer)
+
+                                    <option value="{{ $customer->id }}">
+                                        {{ $customer->name }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+
+                        {{-- Date --}}
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Give Date
+                            </label>
+
+                            <input type="date"
+                                   name="give_date"
+                                   class="form-control"
+                                   value="{{ date('Y-m-d') }}"
+                                   required>
+
+                        </div>
+
+
+                        {{-- Big Tray --}}
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Big Tray
+                            </label>
+
+                            <input type="number"
+                                   name="big_qty"
+                                   class="form-control"
+                                   value="0"
+                                   min="0">
+
+                        </div>
+
+
+                        {{-- Small Tray --}}
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Small Tray
+                            </label>
+
+                            <input type="number"
+                                   name="small_qty"
+                                   class="form-control"
+                                   value="0"
+                                   min="0">
+
+                        </div>
+
+
+                        {{-- Remarks --}}
+                        <div class="col-md-12 mb-3">
+
+                            <label class="form-label">
+                                Remarks
+                            </label>
+
+                            <textarea name="remarks"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Remarks">
+                            </textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Close
+
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Save
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
 </div>
 
 <script>
@@ -440,6 +582,53 @@ document.getElementById('printIndividualTrayLedger')
             table.outerHTML
         );
     });
+/*
+|--------------------------------------------------------------------------
+| Return Tray
+|--------------------------------------------------------------------------
+*/
 
+document.querySelectorAll('.returnTrayBtn').forEach(function (button) {
+
+    button.addEventListener('click', function () {
+
+        const customerId = this.dataset.id;
+
+        document.getElementById('return_customer_id').value =
+            customerId;
+
+        const modal = new bootstrap.Modal(
+            document.getElementById('trayReturnModal')
+        );
+
+        modal.show();
+    });
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Give Tray
+|--------------------------------------------------------------------------
+*/
+
+document.querySelectorAll('.giveTrayBtn').forEach(function (button) {
+
+    button.addEventListener('click', function () {
+
+        const customerId = this.dataset.id;
+
+        document.getElementById('give_customer_id').value =
+            customerId;
+
+        const modal = new bootstrap.Modal(
+            document.getElementById('trayGiveModal')
+        );
+
+        modal.show();
+
+    });
+
+});
 </script>
 @endsection

@@ -95,3 +95,5 @@ Route::put('/cash-sales/{sale}', [CashSaleController::class, 'update'])
 
 Route::delete('/cash-sales/{sale}', [CashSaleController::class, 'destroy'])
     ->name('cash_sales.destroy');
+Route::post('/tray-gives',[TrayReturnController::class, 'give']
+    )->name('tray-gives.store');

@@ -97,3 +97,5 @@ Route::delete('/cash-sales/{sale}', [CashSaleController::class, 'destroy'])
     ->name('cash_sales.destroy');
 Route::post('/tray-gives',[TrayReturnController::class, 'give']
     )->name('tray-gives.store');
+Route::get('/dashboard/sales-overview', [HomeController::class, 'salesOverview'])
+    ->name('dashboard.sales-overview');

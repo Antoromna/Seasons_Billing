@@ -4,49 +4,37 @@
 
 <div class="container-fluid px-3 px-lg-4 py-4">
 
-    <div class="page-heading">
-
-        <div class="page-heading-copy">
-            <span class="page-icon">
-                <i class="bi bi-box"></i>
-            </span>
-
+    <!-- Executive Page Header Card -->
+    <div class="index-header-card d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="index-header-icon">
+                <i class="bi bi-box-seam-fill"></i>
+            </div>
             <div>
-                <h1 class="h3 mb-1">
-                    Products
-                </h1>
+                <h1 class="h3 text-white mb-1 fw-bold">Products Inventory</h1>
+                <p class="text-white-50 mb-0 small">Manage workspace product catalog, unit types, tray requirements, and status.</p>
             </div>
         </div>
-
-        <div class="heading-actions">
-            <a class="btn btn-outline-secondary btn-sm"
-                href="{{ route('products.print') }}"
-                target="_blank">
-                    <i class="bi bi-printer"></i> Print
-                </a>
-            <a class="btn btn-primary btn-sm"
-               href="{{ route('products.create') }}">
-
-                <i class="bi bi-plus-circle"></i>
-                Add Product
-
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('products.print') }}" target="_blank" class="index-action-btn">
+                <i class="bi bi-printer"></i> Print List
             </a>
-
+            <a href="{{ route('products.create') }}" class="index-action-btn index-action-btn-primary">
+                <i class="bi bi-plus-circle"></i> Add Product
+            </a>
         </div>
-
     </div>
 
-    <section class="panel mt-3">
-
-        <div class="panel-header">
-
-            <div>
-                <h2 class="h5 mb-1 section-title">
-                    <i class="bi bi-table"></i>
-                    <span>Products List</span>
-                </h2>
+    <!-- Table List Box Panel -->
+    <section class="panel-custom mt-3">
+        <div class="panel-header-custom">
+            <div class="panel-header-title">
+                <i class="bi bi-table text-success fs-5"></i>
+                <span>Products List</span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill fs-7 ms-2">
+                    {{ count($products) }} Products
+                </span>
             </div>
-
         </div>
 
         <div class="table-responsive">
@@ -117,21 +105,17 @@
                             <div class="d-flex justify-content-end gap-2">
 
                                 {{-- Edit --}}
-                                <a class="btn btn-primary btn-sm"
+                                <a class="btn-action btn-action-primary"
                                    href="{{ route('products.edit', $product->id) }}">
-
-                                    Edit
-
+                                    <i class="bi bi-pencil-square"></i> Edit
                                 </a>
 
                                 {{-- Delete --}}
                                 <button type="button"
-                                        class="btn btn-danger btn-sm"
+                                        class="btn-action btn-action-danger"
                                         data-bs-toggle="modal"
                                         data-bs-target="#deleteModal{{ $product->id }}">
-
-                                    Delete
-
+                                    <i class="bi bi-trash"></i> Delete
                                 </button>
 
                             </div>

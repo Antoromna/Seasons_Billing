@@ -2,35 +2,41 @@
 
 @section('content')
 <div class="container-fluid px-3 px-lg-4 py-4">
-          <div class="page-heading">
-            <div class="page-heading-copy">
-              <span class="page-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
-              <div>
-                <h1 class="h3 mb-1">Customers</h1>
-              </div>
+    <!-- Executive Page Header Card -->
+    <div class="index-header-card d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="index-header-icon">
+                <i class="bi bi-people-fill"></i>
             </div>
-            <div class="heading-actions">
-                <a href="{{ route('customers.print') }}"
-                target="_blank"
-                class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-printer"></i> Print
-                </a>
-                <a class="btn btn-primary btn-sm" href="{{ route('customers.create') }}"><i class="bi bi-person-plus" aria-hidden="true"></i> Add Customer</a></div>
-          </div>
-
-        
-
-          <section class="panel mt-3" id="printSection">
-            <div class="panel-header">
-              <div>
-                <h2 class="h5 mb-1 section-title"><i class="bi bi-table" aria-hidden="true"></i><span>User List</span></h2>
-                {{-- <p class="text-muted mb-0">Search, review, and manage team member accounts.</p> --}}
-              </div>
-              <div class="d-flex flex-wrap gap-2">
-                <input class="form-control form-control-sm table-search" type="search" placeholder="Search users" data-table-search="usersTable" aria-label="Search users">
-                {{-- <a class="btn btn-primary btn-sm" href="{{ route('customers.create') }}"><i class="bi bi-person-plus" aria-hidden="true"></i> Add Customer</a> --}}
-              </div>
+            <div>
+                <h1 class="h3 text-white mb-1 fw-bold">Customers Directory</h1>
+                <p class="text-white-50 mb-0 small">Manage workspace customers, contact details, and account status.</p>
             </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('customers.print') }}" target="_blank" class="index-action-btn">
+                <i class="bi bi-printer"></i> Print List
+            </a>
+            <a href="{{ route('customers.create') }}" class="index-action-btn index-action-btn-primary">
+                <i class="bi bi-person-plus"></i> Add Customer
+            </a>
+        </div>
+    </div>
+
+    <!-- Table List Box Panel -->
+    <section class="panel-custom mt-3" id="printSection">
+        <div class="panel-header-custom">
+            <div class="panel-header-title">
+                <i class="bi bi-table text-primary fs-5"></i>
+                <span>Customer Accounts</span>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fs-7 ms-2">
+                    {{ count($customers) }} Records
+                </span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <input class="form-control form-control-sm table-search" type="search" placeholder="Search customers..." data-table-search="usersTable" aria-label="Search users" style="min-width: 220px; border-radius: 8px;">
+            </div>
+        </div>
             <div class="table-responsive">
               <table class="table align-middle mb-0" id="usersTable" data-searchable-table>
                 <thead>
@@ -100,17 +106,17 @@
                 <div class="d-flex justify-content-end gap-2">
 
                     {{-- Edit --}}
-                    <a class="btn btn-primary btn-sm"
-                    href="{{ route('customers.edit', $customer->id) }}">
-                        Edit
+                    <a class="btn-action btn-action-primary"
+                       href="{{ route('customers.edit', $customer->id) }}">
+                        <i class="bi bi-pencil-square"></i> Edit
                     </a>
 
                     {{-- Delete Button --}}
                     <button type="button"
-                            class="btn btn-danger btn-sm"
+                            class="btn-action btn-action-danger"
                             data-bs-toggle="modal"
                             data-bs-target="#deleteModal{{ $customer->id }}">
-                        Delete
+                        <i class="bi bi-trash"></i> Delete
                     </button>
 
                 </div>

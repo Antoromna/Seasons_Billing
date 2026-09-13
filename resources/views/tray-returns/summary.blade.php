@@ -4,63 +4,48 @@
 
 <div class="container-fluid px-3 px-lg-4 py-4">
 
-    <div class="page-heading">
-
-        <div class="page-heading-copy">
-            <span class="page-icon">
-                <i class="bi bi-grid"></i>
-            </span>
-
+    <!-- Executive Page Header Card -->
+    <div class="index-header-card d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="index-header-icon">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+            </div>
             <div>
-                <h1 class="h3 mb-1">
-                    Tray Ledger
-                </h1>
+                <h1 class="h3 text-white mb-1 fw-bold">Tray Ledger & Summary</h1>
+                <p class="text-white-50 mb-0 small">Monitor customer tray balances, return transactions, and issue records.</p>
             </div>
         </div>
-        <div class="heading-actions d-flex align-items-center gap-3">
-
-            <div class="tray-filter">
-                <a href="{{ request()->fullUrlWithQuery(['balance_filter' => 'all']) }}"
-                class="tray-filter-btn {{ request('balance_filter', 'all') === 'all' ? 'active' : '' }}">
-                    All
-                </a>
-
-                <a href="{{ request()->fullUrlWithQuery(['balance_filter' => 'with_balance']) }}"
-                class="tray-filter-btn {{ request('balance_filter') === 'with_balance' ? 'active' : '' }}">
-                    <i class="bi bi-check-circle"></i>
-                    With Balance
-                </a>
-
-                <a href="{{ request()->fullUrlWithQuery(['balance_filter' => 'without_balance']) }}"
-                class="tray-filter-btn {{ request('balance_filter') === 'without_balance' ? 'active' : '' }}">
-                    <i class="bi bi-dash-circle"></i>
-                    No Balance
-                </a>
-            </div>
-
-            <button type="button"
-                    class="btn btn-primary btn-sm tray-print-btn"
-                    id="printTraySummary">
-                <i class="bi bi-printer me-1"></i>
-                Print
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <button type="button" class="index-action-btn" id="printTraySummary">
+                <i class="bi bi-printer"></i> Print Summary
             </button>
-
-
         </div>
-
     </div>
 
-    <section class="panel mt-3" id="traySummaryPrint">
-
-        <div class="panel-header">
-
-            <div>
-                <h2 class="h5 mb-1 section-title">
-                    <i class="bi bi-table"></i>
-                    <span>Customer Tray Balance</span>
-                </h2>
+    <!-- Table List Box Panel -->
+    <section class="panel-custom mt-3" id="traySummaryPrint">
+        <div class="panel-header-custom">
+            <div class="panel-header-title">
+                <i class="bi bi-table text-primary fs-5"></i>
+                <span>Customer Tray Balances</span>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fs-7 ms-2">
+                    {{ count($summary) }} Customers
+                </span>
             </div>
 
+            <div class="d-flex align-items-center gap-2">
+                <div class="tray-filter btn-group btn-group-sm">
+                    <a href="{{ request()->fullUrlWithQuery(['balance_filter' => 'all']) }}" class="btn btn-outline-secondary {{ request('balance_filter', 'all') === 'all' ? 'active' : '' }}">
+                        All
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['balance_filter' => 'with_balance']) }}" class="btn btn-outline-secondary {{ request('balance_filter') === 'with_balance' ? 'active' : '' }}">
+                        <i class="bi bi-check-circle me-1"></i> With Balance
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['balance_filter' => 'without_balance']) }}" class="btn btn-outline-secondary {{ request('balance_filter') === 'without_balance' ? 'active' : '' }}">
+                        <i class="bi bi-dash-circle me-1"></i> No Balance
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div class="table-responsive">
@@ -105,7 +90,7 @@
                                     {{-- Return Tray --}}
                                     <button
                                         type="button"
-                                        class="btn btn-success btn-sm returnTrayBtn"
+                                        class="btn-action btn-action-success returnTrayBtn"
                                         data-id="{{ $row['customer']->id }}"
                                         data-name="{{ $row['customer']->name }}">
 
@@ -118,7 +103,7 @@
                                     {{-- Give Tray --}}
                                     <button
                                         type="button"
-                                        class="btn btn-primary btn-sm giveTrayBtn"
+                                        class="btn-action btn-action-primary giveTrayBtn"
                                         data-id="{{ $row['customer']->id }}"
                                         data-name="{{ $row['customer']->name }}">
 
@@ -131,7 +116,7 @@
                                     {{-- View Ledger --}}
                                     <button
                                         type="button"
-                                        class="btn btn-secondary btn-sm trayLedger"
+                                        class="btn-action btn-action-info trayLedger"
                                         data-id="{{ $row['customer']->id }}"
                                         data-name="{{ $row['customer']->name }}">
 

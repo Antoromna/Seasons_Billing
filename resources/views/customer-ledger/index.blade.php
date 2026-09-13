@@ -4,62 +4,49 @@
 
 <div class="container-fluid px-3 px-lg-4 py-4">
 
-    <div class="heading-actions">
-
-       <button type="button"
-                class="btn btn-warning btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#pendingModal">
-            Opening Balance
-        </button>
-
-        <button type="button"
-                class="btn btn-success btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#paymentModal">
-            Amount Received
-        </button>
-
-    <form method="GET" action="{{ route('customer-ledger.index') }}">
-        
-        
-
-        <div class="input-group">
-
-            <input type="text"
-                   name="search"
-                   class="form-control"
-                   placeholder="Search Customer..."
-                   value="{{ request('search') }}">
-
-            <button class="btn btn-primary" type="submit">
-                <i class="bi bi-search"></i>
-            </button>
-
-        </div>
-
-    </form>
-
-</div>
-
-    <section class="panel mt-3">
-
-        <div class="panel-header">
-
+    <!-- Executive Page Header Card -->
+    <div class="index-header-card d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="index-header-icon">
+                <i class="bi bi-journal-text"></i>
+            </div>
             <div>
-                <h2 class="h5 mb-1 section-title">
-                    <i class="bi bi-table"></i>
-                    <span>Customers</span>
-                </h2>
+                <h1 class="h3 text-white mb-1 fw-bold">Customer Ledger</h1>
+                <p class="text-white-50 mb-0 small">Track customer dues, pending opening balances, and payment receipts.</p>
             </div>
-            <div class="heading-actions">
-                <a href="{{ route('customer-ledger.print') }}"
-                    target="_blank"
-                    class="btn btn-primary btn-sm">
-                        <i class="bi bi-printer"></i> Print
-                </a> 
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <button type="button" class="index-action-btn" data-bs-toggle="modal" data-bs-target="#pendingModal" style="background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.4);">
+                <i class="bi bi-wallet2"></i> Opening Balance
+            </button>
+            <button type="button" class="index-action-btn" data-bs-toggle="modal" data-bs-target="#paymentModal" style="background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4);">
+                <i class="bi bi-cash"></i> Amount Received
+            </button>
+            <a href="{{ route('customer-ledger.print') }}" target="_blank" class="index-action-btn">
+                <i class="bi bi-printer"></i> Print Summary
+            </a>
+        </div>
+    </div>
+
+    <!-- Table List Box Panel -->
+    <section class="panel-custom mt-3">
+        <div class="panel-header-custom">
+            <div class="panel-header-title">
+                <i class="bi bi-table text-primary fs-5"></i>
+                <span>Customer Balances & Dues</span>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fs-7 ms-2">
+                    {{ count($customers) }} Accounts
+                </span>
             </div>
 
+            <div class="d-flex align-items-center gap-2">
+                <form method="GET" action="{{ route('customer-ledger.index') }}" class="d-flex align-items-center gap-1">
+                    <input type="text" name="search" class="form-control form-control-sm" placeholder="Search customer..." value="{{ request('search') }}" style="min-width: 220px; border-radius: 8px;">
+                    <button class="btn btn-primary btn-sm rounded-2" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+            </div>
         </div>
 
         <div class="table-responsive">

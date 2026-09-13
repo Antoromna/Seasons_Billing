@@ -99,3 +99,7 @@ Route::post('/tray-gives',[TrayReturnController::class, 'give']
     )->name('tray-gives.store');
 Route::get('/dashboard/sales-overview', [HomeController::class, 'salesOverview'])
     ->name('dashboard.sales-overview');
+Route::get('/dashboard/product-sales', [HomeController::class, 'productSales'])
+    ->name('dashboard.product-sales');
+Route::get('/dashboard/daily-product-sales', [HomeController::class, 'dailyProductSales'])
+    ->name('dashboard.daily-product-sales');

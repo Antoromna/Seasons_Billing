@@ -367,7 +367,7 @@ function clearEntry()
     ts.clear();
 
     $('#unit').val('');
-    $('#quantity').val(1);
+    $('#quantity').val('');
 
     $('#trayType')
         .val('No Tray')
@@ -381,6 +381,10 @@ function clearEntry()
     $('#lineTotal').val('');
 
     ts.focus();
+    if (ts.control_input) {
+        ts.control_input.focus();
+    }
+    ts.open();
 }
 
 // Remove row
@@ -798,6 +802,76 @@ $(document).ready(function () {
             calculateBalance();
         });
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Customer Enter -> Switch to Product Entry Dropdown
+    |--------------------------------------------------------------------------
+    */
+
+    function moveToProductSelect() {
+        const productSelect = document.getElementById('productSelect');
+        if (!productSelect) return;
+
+        if (productSelect.tomselect) {
+            productSelect.tomselect.focus();
+            if (productSelect.tomselect.control_input) {
+                productSelect.tomselect.control_input.focus();
+            }
+            productSelect.tomselect.open();
+        } else {
+            productSelect.focus();
+            if (typeof productSelect.showPicker === 'function') {
+                try {
+                    productSelect.showPicker();
+                } catch (e) {}
+            }
+        }
+    }
+
+    // Delegated Enter keydown on TomSelect wrapper for customer_id
+    $(document).on('keydown', '.ts-wrapper:has(#customer_id) input, #customer_id ~ .ts-wrapper input', function (e) {
+        if (e.key === 'Enter') {
+            setTimeout(function () {
+                const custEl = document.getElementById('customer_id');
+                const val = custEl?.tomselect ? custEl.tomselect.getValue() : $(custEl).val();
+                if (val) {
+                    moveToProductSelect();
+                }
+            }, 60);
+        }
+    });
+
+    // Native customer_id select Enter
+    $('#customer_id').on('keydown', function (e) {
+        if (e.key === 'Enter' && $(this).val()) {
+            e.preventDefault();
+            moveToProductSelect();
+        }
+    });
+
+    // Attach to TomSelect instance control_input directly
+    function setupCustomerTomSelect() {
+        const custEl = document.getElementById('customer_id');
+        if (custEl && custEl.tomselect) {
+            const ts = custEl.tomselect;
+            if (ts.control_input) {
+                ts.control_input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        setTimeout(function () {
+                            if (ts.getValue()) {
+                                moveToProductSelect();
+                            }
+                        }, 60);
+                    }
+                });
+            }
+        } else if (custEl) {
+            setTimeout(setupCustomerTomSelect, 100);
+        }
+    }
+
+    setupCustomerTomSelect();
 
 });
 

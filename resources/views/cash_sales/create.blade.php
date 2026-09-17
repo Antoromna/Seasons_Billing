@@ -256,7 +256,7 @@
 
                     <input type="number"
                            class="form-control trayCount"
-                           value="0"
+                           value=""
                            min="0"
                            placeholder="Count"
                            disabled>
@@ -577,7 +577,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     trayType.value = 'No Tray';
 
-                    trayCount.value = 0;
+                    trayCount.value = '';
 
                     trayCount.disabled = true;
 
@@ -615,7 +615,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 trayType.value = 'No Tray';
 
-                trayCount.value = 0;
+                trayCount.value = '';
 
                 trayCount.disabled = true;
 
@@ -654,7 +654,7 @@ document.addEventListener('DOMContentLoaded', function () {
             {
                 if (this.value === 'No Tray') {
 
-                    trayCount.value = 0;
+                    trayCount.value = '';
 
                     trayCount.disabled = true;
 
@@ -662,7 +662,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     trayCount.disabled = false;
 
+                    trayCount.value = '';
+
                     trayCount.focus();
+
+                    trayCount.select();
 
                 }
             }
@@ -743,10 +747,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (!trayType.disabled) {
                     trayType.focus();
+                    if (typeof trayType.showPicker === 'function') {
+                        try {
+                            trayType.showPicker();
+                        } catch (err) {}
+                    }
                 } else {
                     price.focus();
                     price.select();
                 }
+            }
+        });
+
+        // Tray Type Focus -> show dropdown picker
+        trayType.addEventListener('focus', function () {
+            if (!this.disabled && typeof this.showPicker === 'function') {
+                try {
+                    this.showPicker();
+                } catch (err) {}
             }
         });
 
@@ -756,10 +774,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.preventDefault();
                 e.stopPropagation();
 
-                if (this.value !== 'No Tray' && !trayCount.disabled) {
+                if (this.value !== 'No Tray') {
+                    trayCount.disabled = false;
                     trayCount.focus();
                     trayCount.select();
                 } else {
+                    trayCount.value = '';
+                    trayCount.disabled = true;
                     price.focus();
                     price.select();
                 }
@@ -1152,7 +1173,7 @@ document.addEventListener('DOMContentLoaded', function () {
         billSection.querySelector('.trayType').disabled =
             false;
 
-        billSection.querySelector('.trayCount').value = 0;
+        billSection.querySelector('.trayCount').value = '';
 
         billSection.querySelector('.trayCount').disabled =
             true;

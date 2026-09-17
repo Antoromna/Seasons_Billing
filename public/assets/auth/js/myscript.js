@@ -106,7 +106,7 @@ $('#productSelect').on('change', function () {
         .prop('disabled', true);
 
     $('#trayCount')
-        .val(0)
+        .val('')
         .prop('disabled', true);
 
 } else {
@@ -134,7 +134,7 @@ function updateTrayCountState()
     if (trayType === 'No Tray') {
 
         $('#trayCount')
-            .val(0)
+            .val('')
             .prop('disabled', true);
 
     } else {
@@ -374,7 +374,7 @@ function clearEntry()
         .prop('disabled', false);
 
     $('#trayCount')
-        .val(0)
+        .val('')
         .prop('disabled', false);
 
     $('#price').val('');

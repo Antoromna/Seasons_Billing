@@ -155,8 +155,7 @@
                                id="quantity"
                                class="form-control"
                                min="0"
-                               step="0.001"
-                               value="1">
+                               step="any">
 
                     </div>
 
@@ -629,6 +628,7 @@ document.addEventListener('DOMContentLoaded', function () {
         calculateLineTotal();
 
         quantity.focus();
+        quantity.select();
 
     });
 
@@ -667,9 +667,120 @@ document.addEventListener('DOMContentLoaded', function () {
 
             trayCount.disabled = false;
             trayCount.focus();
+            trayCount.select();
 
         }
 
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Enter Key Navigation (Line by line, skipping disabled / auto-filled fields)
+    |--------------------------------------------------------------------------
+    */
+
+    // Product Select Enter -> move to Quantity
+    productSelect.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (this.value) {
+                quantity.focus();
+                quantity.select();
+            } else if (this.tomselect) {
+                this.tomselect.open();
+            } else if (typeof this.showPicker === 'function') {
+                try {
+                    this.showPicker();
+                } catch (err) {}
+            }
+        }
+    });
+
+    // Quantity Enter -> move to Tray Type (if enabled) or Price (skipping disabled tray)
+    quantity.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const qtyVal = parseFloat(this.value) || 0;
+            if (qtyVal <= 0) {
+                alert('Enter valid quantity');
+                this.focus();
+                return;
+            }
+
+            if (!trayType.disabled) {
+                trayType.focus();
+            } else {
+                price.focus();
+                price.select();
+            }
+        }
+    });
+
+    // Tray Type Enter -> move to Tray Count (if enabled) or Price (skipping disabled count if No Tray)
+    trayType.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (this.value !== 'No Tray' && !trayCount.disabled) {
+                trayCount.focus();
+                trayCount.select();
+            } else {
+                price.focus();
+                price.select();
+            }
+        }
+    });
+
+    // Tray Count Enter -> move to Price
+    trayCount.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (trayType.value !== 'No Tray') {
+                const countVal = parseInt(this.value) || 0;
+                if (countVal <= 0) {
+                    alert('Please enter tray quantity');
+                    this.focus();
+                    return;
+                }
+            }
+
+            price.focus();
+            price.select();
+        }
+    });
+
+    // Price Enter -> move to Add button (skipping readonly total)
+    price.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const priceVal = parseFloat(this.value) || 0;
+            if (priceVal <= 0) {
+                alert('Enter valid price');
+                this.focus();
+                return;
+            }
+
+            addProductBtn.focus();
+        }
+    });
+
+    // Add Button Enter -> trigger click to add product
+    addProductBtn.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            this.click();
+        }
     });
 
 
@@ -1051,16 +1162,20 @@ document.addEventListener('DOMContentLoaded', function () {
         | Bill Total
         */
 
-        billTotal.textContent =
-            total.toFixed(2);
+        if (billTotal) {
+            billTotal.textContent =
+                total.toFixed(2);
+        }
 
 
         /*
         | Net Amount
         */
 
-        netAmount.textContent =
-            total.toFixed(2);
+        if (netAmount) {
+            netAmount.textContent =
+                total.toFixed(2);
+        }
 
 
         /*
@@ -1070,9 +1185,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const newBalance =
             total - paidAmount;
 
-
-        balance.textContent =
-            newBalance.toFixed(2);
+        if (balance) {
+            balance.textContent =
+                newBalance.toFixed(2);
+        }
 
     }
 
@@ -1114,7 +1230,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         unit.value = '';
 
-        quantity.value = 1;
+        quantity.value = '';
 
         trayType.value = 'No Tray';
         trayType.disabled = false;
@@ -1125,6 +1241,19 @@ document.addEventListener('DOMContentLoaded', function () {
         price.value = '';
 
         lineTotal.value = '0.00';
+
+        productSelect.focus();
+
+        if (productSelect.tomselect) {
+            productSelect.tomselect.focus();
+            productSelect.tomselect.open();
+        } else if (typeof productSelect.showPicker === 'function') {
+            try {
+                productSelect.showPicker();
+            } catch (err) {
+                console.log('Error opening product picker:', err);
+            }
+        }
     }
 
 

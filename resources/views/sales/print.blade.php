@@ -19,27 +19,27 @@
             width:500px;
             margin:0 auto;
             background:#fff;
-            padding:25px;
+            padding:12px;
         }
         .print_header{
-            font-size: 14px !important;
+            font-size: 18px !important;
         }
         .company{
-            font-size:20px;
+            font-size:22px;
             font-weight:700;
-            color:#5b2c2c; /* dark maroon */
+            color:darkred; /* dark maroon */
             margin-bottom:2px;
         }
 
         .subtitle{
-            font-size:15px;
+            font-size:17px;
             font-weight:600;
             color:#222;
             margin-bottom:2px;
         }
 
         .address{
-            font-size:15px;
+            font-size:17px;
             font-weight:600;
             color:#333;
             line-height:1.2;
@@ -47,7 +47,7 @@
         }
 
         .phone{
-            font-size:15px;
+            font-size:17px;
             font-weight:700;
             color:#333;
         }
@@ -78,7 +78,7 @@
 
         table th,
         table td{
-            border:1px solid #000;
+            border:2px solid #000;
             padding:4px;
         }
 
@@ -88,7 +88,7 @@
         }
 
         .summary td{
-            border:1px solid #000;
+            border:2px solid #000;
             padding:4px;
         }
 
@@ -123,7 +123,7 @@
         }
         thead th,
         .total-row td{
-            border:1px solid #000;
+            border:2px solid #000;
         }
 
         .item-row td{
@@ -134,8 +134,8 @@
 
         .empty-row td{
             height:30px;
-            border-left:1px solid #000;
-            border-right:1px solid #000;
+            border-left:2px solid #000;
+            border-right:2px solid #000;
             border-top:none;
             border-bottom:none;
         }
@@ -152,6 +152,7 @@
 
         .balance-table .label{
             text-align:right;
+            font-size: 18px;
         }
 
         .balance-table .colon{
@@ -164,22 +165,22 @@
         .crate-table{
             width:100%;
             border-collapse:collapse;
-            border:1px solid #000;
+            border:2px solid #000;
         }
 
         .crate-table th{
-            border:1px solid #000 !important;
+            border:2px solid #000 !important;
         }
 
         .crate-table td{
-            border-left:1px solid #000 !important;
-            border-right:1px solid #000 !important;
+            border-left:2px solid #000 !important;
+            border-right:2px solid #000 !important;
             border-top:none !important;
             border-bottom:none !important;
         }
 
         .crate-table tr:last-child td{
-            border-bottom:1px solid #000 !important;
+            border-bottom:2px solid #000 !important;
         }
 
         @media print{
@@ -248,7 +249,7 @@
                 <tr>
                     <td width="25%">
                         {{-- Logo --}}
-                        <img src="{{ asset('images/Seasons_Logo.png') }}" style="width:110px;height:auto;">
+                        <img src="{{ asset('images/Seasons_Logo.png') }}" style="width:115px;height:auto;">
                     </td>
 
                     <td class="text-center">
@@ -279,21 +280,21 @@
             font-family:'Times New Roman', serif;
             font-weight:700;
             font-size:22px;
-            margin:8px 0;
+            margin:5px 0;
             text-decoration:underline;
         ">
             INVOICE
         </h3>
         <table class="no-border" style="width:100%;">
     <tr>
-        <td style="font-size:18px;">
-            <span style="font-size:18px;">Bill No :</span>
-            <span style="font-size:18px; font-weight:700;">
+        <td style="font-size:20px;">
+            <span style="font-size:20px;">Bill No :</span>
+            <span style="font-size:20px; font-weight:700;">
                 {{ $sale->bill_no }}
             </span>
         </td>
 
-        <td class="text-right" style="font-size:18px;">
+        <td class="text-right" style="font-size:20px;">
             Date :
             <span style="font-weight:700;">
                 {{ \Carbon\Carbon::parse($sale->bill_date)->format('d/m/Y') }}
@@ -302,12 +303,12 @@
     </tr>
 
     <tr>
-        <td colspan="2" style="padding-top:8px; font-size:18px;">
+        <td colspan="2" style="padding-top:8px; font-size:20px;">
             <span style="display:inline-block; width:55px;">
                 To
             </span>
             :
-            <span style="font-weight:700; margin-left:5px;">
+            <span style="font-weight:700; margin-left:5px;text-transform: uppercase;">
                 {{ $sale->customer->name ?? '' }}
             </span>
 
@@ -331,7 +332,7 @@
                 </tr>
             </thead>
 
-            <tbody style="font-size: 15px;">
+            <tbody style="font-size: 16px;">
 
                 @foreach($sale->items as $key => $item)
 
@@ -369,7 +370,7 @@
                 </tr>
                 @endfor
 
-                <tr style="font-weight:bold;">
+                <tr style="font-weight:bold;font-size: 18px;">
                     <td colspan="2" style="text-align:right;">
                         <strong>Total</strong>
                     </td>
@@ -424,7 +425,7 @@
 
                     <td width="45%" valign="top">
 
-                        <table class="crate-table" style="font-size: 14px;">
+                        <table class="crate-table" style="font-size: 18px;">
                             <tr>
                     <th>Crates</th>
                     <th>B</th>
@@ -474,26 +475,26 @@
 
                     </table>
 
-                    <div style="border-top:2px solid #4b8beb; margin:2px 0 2px 15px;"></div>
+                    <div style="border-top:2px solid #2156a5; margin:2px 0 2px 15px;"></div>
 
                     <table class="balance-table">
                         <tr>
-                            <td class="label"><strong>Net Balance</strong></td>
+                            <td class="label" style="font-size: 20px;" ><strong>Net Balance</strong></td>
                             <td class="colon"><strong>: ₹</strong></td>
-                            <td class="amount">
+                            <td class="amount" style="font-size: 17px;" >
                                 <strong>{{ number_format($ledgerBalance,2) }}</strong>
                             </td>
                         </tr>
                     </table>
-                    <div style="border-top:2px solid #4b8beb; margin:2px 0 2px 15px;"></div>
+                    <div style="border-top:2px solid #2156a5; margin:2px 0 2px 15px;"></div>
 
             </td>
 
             </tr>
         </table>
-       <table style="width:100%; border:none; font-size:13px; line-height:8px; margin-top:5px;">
+       <table style="width:100%; border:none; font-size:14px; line-height:10px; margin-top:5px;">
             <tr>
-                <td style="border:none; width:115px;">Bank Details</td>
+                <td style="border:none; width:120px;">Bank Details</td>
                 <td style="border:none; width:10px;">:</td>
                 <td style="border:none;"><strong>For SEASONS FRUITS TRADERS</strong></td>
             </tr>
@@ -511,7 +512,7 @@
             </tr>
 
             <tr>
-            <td colspan="3" style="border:none;">
+            <td colspan="3" style="border:none;padding-top: 15px;">
                 <table style="width:100%; border:none;">
                     <tr>
                         <td style="border:none; text-align:left;">
@@ -519,7 +520,7 @@
                         </td>
 
                         <td style="border:none; text-align:right;">
-                            <strong style="color:#8b0000; font-size:15px;">
+                            <strong style="color:#8b0000; font-size:17px;">
                                 For Seasons Fruits Traders
                             </strong>
                         </td>
@@ -529,7 +530,7 @@
             </td>
         </tr>
         </table>
-        <div style="border-top:2px solid #4b8beb; margin-top:3px;"></div>
+        <div style="border-top:2px solid #2156a5; margin-top:3px;"></div>
         
 
     </div>

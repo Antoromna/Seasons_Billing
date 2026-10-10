@@ -188,100 +188,7 @@ public function print($id)
         ->where('id', $id)
         ->get();
 
-    foreach ($sales as $sale) {
-
-        // Today's sale crates
-    $sale->bigCrates = $sale->items
-        ->where('tray', 'Big')
-        ->sum('tray_qty');
-
-    $sale->smallCrates = $sale->items
-        ->where('tray', 'Small')
-        ->sum('tray_qty');
-
-
-    // Previous sales (before this bill)
-    $previousBigSales = SaleItem::whereHas('sale', function ($q) use ($sale) {
-        $q->where('customer_id', $sale->customer_id)
-        ->where('bill_date', '<', $sale->bill_date);
-    })
-    ->where('tray', 'Big')
-    ->sum('tray_qty');
-
-    $previousSmallSales = SaleItem::whereHas('sale', function ($q) use ($sale) {
-        $q->where('customer_id', $sale->customer_id)
-        ->where('bill_date', '<', $sale->bill_date);
-    })
-    ->where('tray', 'Small')
-    ->sum('tray_qty');
-
-
-    // Previous returns (before this bill)
-    $previousBigReturns = TrayReturn::where('customer_id', $sale->customer_id)
-        ->where('transaction_type', 'returned')
-        ->where('tray_type', 'Big')
-        ->where('return_date', '<', $sale->bill_date)
-        ->sum('tray_qty');
-
-    $previousSmallReturns = TrayReturn::where('customer_id', $sale->customer_id)
-        ->where('transaction_type', 'returned')
-        ->where('tray_type', 'Small')
-        ->where('return_date', '<', $sale->bill_date)
-        ->sum('tray_qty');
-
-
-    // Previous balance
-    $sale->previousBigBalance = $previousBigSales - $previousBigReturns;
-    $sale->previousSmallBalance = $previousSmallSales - $previousSmallReturns;
-
-
-    // Today's returns
-    $todayBigReturn = TrayReturn::where('customer_id', $sale->customer_id)
-        ->where('tray_type', 'Big')
-        ->whereDate('return_date', $sale->bill_date)
-        ->sum('tray_qty');
-
-    $todaySmallReturn = TrayReturn::where('customer_id', $sale->customer_id)
-        ->where('tray_type', 'Small')
-        ->whereDate('return_date', $sale->bill_date)
-        ->sum('tray_qty');
-
-
-    // Current balance
-    $sale->currentBigBalance = $sale->previousBigBalance + $sale->bigCrates - $todayBigReturn;
-    $sale->currentSmallBalance = $sale->previousSmallBalance + $sale->smallCrates - $todaySmallReturn;
-
-
-            // Ledger calculation
-            $openingBalance = CustomerOpeningBalance::where(
-                'customer_id',
-                $sale->customer_id
-            )->sum('amount');
-
-            $previousSales = Sale::where('customer_id', $sale->customer_id)
-                ->whereDate('bill_date', '<', $sale->bill_date)
-                ->sum('net_amount');
-
-            $payments = CustomerPayment::where('customer_id', $sale->customer_id)
-                ->sum('amount');
-
-            $discount = CustomerPayment::where('customer_id', $sale->customer_id)
-                ->sum('discount_amount');
-
-            $sale->previousBalance =
-                $openingBalance +
-                $previousSales -
-                ($payments + $discount);
-
-            $sale->previousBalance =
-                $openingBalance +
-                $previousSales -
-                $payments;
-
-            $sale->ledgerBalance =
-                $sale->previousBalance +
-                $sale->net_amount;
-        }
+    $this->prepareSalePrintData($sales);
 
     return view('sales.print', [
         'sales' => $sales,
@@ -370,10 +277,143 @@ public function bulkPrint(Request $request)
         ->orderBy('bill_date')
         ->get();
 
+    $this->prepareSalePrintData($sales);
+
     return view('sales.print', [
         'sales' => $sales,
         'isBulk' => true
     ]);
+}
+
+private function prepareSalePrintData($sales)
+{
+    foreach ($sales as $sale) {
+        // Today's sale crates
+        $sale->bigCrates = $sale->items
+            ->where('tray', 'Big')
+            ->sum('tray_qty');
+
+        $sale->smallCrates = $sale->items
+            ->where('tray', 'Small')
+            ->sum('tray_qty');
+
+        if ($sale->customer_id) {
+            // Previous crate sales (before this bill)
+            $previousBigSales = SaleItem::whereHas('sale', function ($q) use ($sale) {
+                $q->where('customer_id', $sale->customer_id)
+                    ->where(function ($sub) use ($sale) {
+                        $sub->whereDate('bill_date', '<', $sale->bill_date)
+                            ->orWhere(function ($s) use ($sale) {
+                                $s->whereDate('bill_date', $sale->bill_date)
+                                    ->where('id', '<', $sale->id);
+                            });
+                    });
+            })
+            ->where('tray', 'Big')
+            ->sum('tray_qty');
+
+            $previousSmallSales = SaleItem::whereHas('sale', function ($q) use ($sale) {
+                $q->where('customer_id', $sale->customer_id)
+                    ->where(function ($sub) use ($sale) {
+                        $sub->whereDate('bill_date', '<', $sale->bill_date)
+                            ->orWhere(function ($s) use ($sale) {
+                                $s->whereDate('bill_date', $sale->bill_date)
+                                    ->where('id', '<', $sale->id);
+                            });
+                    });
+            })
+            ->where('tray', 'Small')
+            ->sum('tray_qty');
+
+            // Previous crate returns (before this bill)
+            $previousBigReturns = TrayReturn::where('customer_id', $sale->customer_id)
+                ->where('transaction_type', 'returned')
+                ->where('tray_type', 'Big')
+                ->where(function ($q) use ($sale) {
+                    $q->whereDate('return_date', '<', $sale->bill_date)
+                        ->orWhere(function ($s) use ($sale) {
+                            $s->whereDate('return_date', $sale->bill_date)
+                                ->where('created_at', '<', $sale->created_at);
+                        });
+                })
+                ->sum('tray_qty');
+
+            $previousSmallReturns = TrayReturn::where('customer_id', $sale->customer_id)
+                ->where('transaction_type', 'returned')
+                ->where('tray_type', 'Small')
+                ->where(function ($q) use ($sale) {
+                    $q->whereDate('return_date', '<', $sale->bill_date)
+                        ->orWhere(function ($s) use ($sale) {
+                            $s->whereDate('return_date', $sale->bill_date)
+                                ->where('created_at', '<', $sale->created_at);
+                        });
+                })
+                ->sum('tray_qty');
+
+            $sale->previousBigBalance = $previousBigSales - $previousBigReturns;
+            $sale->previousSmallBalance = $previousSmallSales - $previousSmallReturns;
+
+            // Today's returns up to this bill
+            $todayBigReturn = TrayReturn::where('customer_id', $sale->customer_id)
+                ->where('transaction_type', 'returned')
+                ->where('tray_type', 'Big')
+                ->whereDate('return_date', $sale->bill_date)
+                ->where('created_at', '<=', $sale->created_at)
+                ->sum('tray_qty');
+
+            $todaySmallReturn = TrayReturn::where('customer_id', $sale->customer_id)
+                ->where('transaction_type', 'returned')
+                ->where('tray_type', 'Small')
+                ->whereDate('return_date', $sale->bill_date)
+                ->where('created_at', '<=', $sale->created_at)
+                ->sum('tray_qty');
+
+            $sale->currentBigBalance = $sale->previousBigBalance + $sale->bigCrates - $todayBigReturn;
+            $sale->currentSmallBalance = $sale->previousSmallBalance + $sale->smallCrates - $todaySmallReturn;
+
+            // Ledger calculation
+            $openingBalance = CustomerOpeningBalance::where('customer_id', $sale->customer_id)
+                ->where('created_at', '<=', $sale->created_at)
+                ->sum('amount');
+
+            $previousSales = Sale::where('customer_id', $sale->customer_id)
+                ->where(function ($q) use ($sale) {
+                    $q->whereDate('bill_date', '<', $sale->bill_date)
+                        ->orWhere(function ($s) use ($sale) {
+                            $s->whereDate('bill_date', $sale->bill_date)
+                                ->where('id', '<', $sale->id);
+                        });
+                })
+                ->sum('net_amount');
+
+            $payment = CustomerPayment::where('customer_id', $sale->customer_id)
+                ->where(function ($q) use ($sale) {
+                    $q->whereDate('payment_date', '<', $sale->bill_date)
+                        ->orWhere(function ($s) use ($sale) {
+                            $s->whereDate('payment_date', $sale->bill_date)
+                                ->where('created_at', '<', $sale->created_at);
+                        });
+                })
+                ->selectRaw('SUM(amount) as amount, SUM(discount_amount) as discount')
+                ->first();
+
+            $payments = $payment->amount ?? 0;
+            $discount = $payment->discount ?? 0;
+
+            $calculatedPrevBalance = $openingBalance + $previousSales - ($payments + $discount);
+
+            // Use stored previous_balance if available, else calculatedPrevBalance
+            $sale->previousBalance = $sale->previous_balance ?? $calculatedPrevBalance;
+            $sale->ledgerBalance = $sale->previousBalance + $sale->net_amount;
+        } else {
+            $sale->previousBigBalance = 0;
+            $sale->previousSmallBalance = 0;
+            $sale->currentBigBalance = $sale->bigCrates;
+            $sale->currentSmallBalance = $sale->smallCrates;
+            $sale->previousBalance = $sale->previous_balance ?? 0;
+            $sale->ledgerBalance = $sale->previousBalance + $sale->net_amount;
+        }
+    }
 }
 public function getBalance($customerId)
 {

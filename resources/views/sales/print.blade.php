@@ -389,34 +389,50 @@
         </table>
 
         @php
+            if (isset($sale->previousBalance)) {
+                $previousBalance = $sale->previousBalance;
+                $ledgerBalance = $sale->ledgerBalance ?? ($previousBalance + $sale->net_amount);
+            } elseif (isset($sale->previous_balance) && $sale->previous_balance !== null) {
+                $previousBalance = $sale->previous_balance;
+                $ledgerBalance = $sale->balance ?? ($previousBalance + $sale->net_amount);
+            } else {
+                $openingBalance = $sale->customer_id
+                    ? \App\Models\CustomerOpeningBalance::where('customer_id', $sale->customer_id)
+                        ->where('created_at', '<=', $sale->created_at)
+                        ->sum('amount')
+                    : 0;
 
-            $openingBalance =
-                \App\Models\CustomerOpeningBalance::where(
-                    'customer_id',
-                    $sale->customer_id
-                )->sum('amount');
+                $previousSales = $sale->customer_id
+                    ? \App\Models\Sale::where('customer_id', $sale->customer_id)
+                        ->where(function ($q) use ($sale) {
+                            $q->whereDate('bill_date', '<', $sale->bill_date)
+                              ->orWhere(function ($s) use ($sale) {
+                                  $s->whereDate('bill_date', $sale->bill_date)
+                                      ->where('id', '<', $sale->id);
+                              });
+                        })
+                        ->sum('net_amount')
+                    : 0;
 
-            $previousSales =
-                \App\Models\Sale::where('customer_id', $sale->customer_id)
-                    ->whereDate('bill_date', '<', $sale->bill_date)
-                    ->sum('net_amount');
+                $payment = $sale->customer_id
+                    ? \App\Models\CustomerPayment::where('customer_id', $sale->customer_id)
+                        ->where(function ($q) use ($sale) {
+                            $q->whereDate('payment_date', '<', $sale->bill_date)
+                              ->orWhere(function ($s) use ($sale) {
+                                  $s->whereDate('payment_date', $sale->bill_date)
+                                      ->where('created_at', '<', $sale->created_at);
+                              });
+                        })
+                        ->selectRaw('SUM(amount) as amount, SUM(discount_amount) as discount')
+                        ->first()
+                    : null;
 
-            $payment = \App\Models\CustomerPayment::where('customer_id', $sale->customer_id)
-                ->selectRaw('SUM(amount) as amount, SUM(discount_amount) as discount')
-                ->first();
+                $payments = $payment->amount ?? 0;
+                $discount = $payment->discount ?? 0;
 
-            $payments = $payment->amount ?? 0;
-            $discount = $payment->discount ?? 0;
-
-            $previousBalance =
-                $openingBalance +
-                $previousSales -
-                ($payments + $discount);
-
-            $ledgerBalance =
-                $previousBalance +
-                $sale->net_amount;
-
+                $previousBalance = $openingBalance + $previousSales - ($payments + $discount);
+                $ledgerBalance = $previousBalance + $sale->net_amount;
+            }
         @endphp
 
             <table class="no-border" style="margin-top:5px;">

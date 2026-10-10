@@ -560,41 +560,129 @@ $('#payment_type').on('change', function () {
         $('#sale_id').val('');
     }
 });
+let currentCustomerPaymentBalance = 0;
+let isCustomerBalanceLoaded = false;
+
+function formatIndianCurrency(amount) {
+    let num = parseFloat(amount) || 0;
+    let isNeg = num < 0;
+    let absVal = Math.abs(num);
+    let formatted = absVal.toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+    return (isNeg ? '-' : '') + '₹ ' + formatted;
+}
+
+function renderCustomerBalanceCard(balance) {
+    $('#customer_balance_card').removeClass('d-none');
+    $('#customer_balance_amount').text(formatIndianCurrency(balance));
+
+    if (balance > 0) {
+        $('#customer_balance_amount').css('color', '#f87171'); // Soft red/coral for amount due
+        $('#customer_balance_status').html('<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1"><i class="bi bi-exclamation-circle me-1"></i>Amount Due</span>');
+    } else if (balance < 0) {
+        $('#customer_balance_amount').css('color', '#38bdf8'); // Sky blue for advance/credit
+        $('#customer_balance_status').html('<span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1"><i class="bi bi-arrow-up-right-circle me-1"></i>Advance / Credit</span>');
+    } else {
+        $('#customer_balance_amount').css('color', '#34d399'); // Emerald green for nil
+        $('#customer_balance_status').html('<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check2-circle me-1"></i>No Dues</span>');
+    }
+}
+
+function updatePaymentCalculation() {
+    if (!isCustomerBalanceLoaded) {
+        $('#payment_calc_breakdown').addClass('d-none');
+        return;
+    }
+
+    let amtVal = $('#payment_amount_input').val();
+    let enteredAmount = parseFloat(amtVal);
+
+    if (isNaN(enteredAmount) || enteredAmount <= 0) {
+        $('#payment_calc_breakdown').addClass('d-none');
+        return;
+    }
+
+    $('#payment_calc_breakdown').removeClass('d-none');
+
+    let current = currentCustomerPaymentBalance;
+    let remaining = current - enteredAmount;
+
+    $('#calc_current_bal_val').text(formatIndianCurrency(current));
+    $('#calc_received_amt_val').text('- ' + formatIndianCurrency(enteredAmount).replace('-', ''));
+    $('#calc_remaining_bal_val').text(formatIndianCurrency(remaining));
+
+    if (Math.abs(remaining) < 0.001) {
+        $('#calc_remaining_bal_val').css('color', '#34d399');
+        $('#calc_remaining_label').html('<i class="bi bi-check-circle-fill text-success me-1"></i> Balance After Payment:');
+        $('#calc_settlement_badge').html('<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check2-all me-1"></i>Fully Settled (Nil Balance)</span>');
+    } else if (remaining > 0) {
+        $('#calc_remaining_bal_val').css('color', '#fbbf24');
+        $('#calc_remaining_label').html('<i class="bi bi-hourglass-split text-warning me-1"></i> Remaining Due:');
+        $('#calc_settlement_badge').html('<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">Pending Due: ' + formatIndianCurrency(remaining) + '</span>');
+    } else {
+        $('#calc_remaining_bal_val').css('color', '#38bdf8');
+        $('#calc_remaining_label').html('<i class="bi bi-shield-check text-info me-1"></i> New Advance Credit:');
+        $('#calc_settlement_badge').html('<span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">Excess Payment (Advance Credit: ' + formatIndianCurrency(Math.abs(remaining)) + ')</span>');
+    }
+}
+
+$(document).on('input keyup change', '#payment_amount_input', function () {
+    updatePaymentCalculation();
+});
+
+$('#paymentModal').on('hidden.bs.modal', function () {
+    $('#customer_id_payment').val('');
+    $('#payment_amount_input').val('');
+    $('#customer_balance_card').addClass('d-none');
+    $('#payment_calc_breakdown').addClass('d-none');
+    currentCustomerPaymentBalance = 0;
+    isCustomerBalanceLoaded = false;
+});
+
 $(document).on('click', '.paymentBtn', function () {
 
     let customerId = $(this).data('id');
 
     $('#payment_customer_id').val(customerId);
+    $('#customer_id_payment').val(customerId).trigger('change');
 
-    $.get('/customer/' + customerId + '/sales', function (sales) {
-
-        let options = '<option value="">Select Bill</option>';
-
-        $.each(sales, function (i, sale) {
-
-            let pending = sale.net_amount - sale.paid_amount;
-
-            options += `
-                <option value="${sale.id}">
-                    ${sale.bill_no} - Pending ₹${pending}
-                </option>
-            `;
-        });
-
-        $('#sale_id').html(options);
-
-        $('#paymentModal').modal('show');
-    });
+    $('#paymentModal').modal('show');
 });
+
 $('#customer_id_payment').on('change', function () {
 
     let customerId = $(this).val();
+    $('#payment_customer_id').val(customerId);
 
     $('#sale_id').html('<option value="">Select Bill</option>');
 
     if (!customerId) {
+        currentCustomerPaymentBalance = 0;
+        isCustomerBalanceLoaded = false;
+        $('#customer_balance_card').addClass('d-none');
+        $('#payment_calc_breakdown').addClass('d-none');
         return;
     }
+
+    // Instant balance preview from selected option data attribute
+    let selectedOption = $(this).find('option:selected');
+    let initialDue = selectedOption.data('due');
+    if (initialDue !== undefined && initialDue !== null && initialDue !== '') {
+        currentCustomerPaymentBalance = parseFloat(initialDue) || 0;
+        isCustomerBalanceLoaded = true;
+        renderCustomerBalanceCard(currentCustomerPaymentBalance);
+        updatePaymentCalculation();
+    }
+
+    // Always fetch latest real-time balance from API
+    $.get('/customers/' + customerId + '/balance', function (response) {
+        currentCustomerPaymentBalance = parseFloat(response.balance) || 0;
+        isCustomerBalanceLoaded = true;
+        renderCustomerBalanceCard(currentCustomerPaymentBalance);
+        updatePaymentCalculation();
+    });
 
     $.get('/customer/' + customerId + '/sales', function (sales) {
 

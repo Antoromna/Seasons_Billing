@@ -143,24 +143,7 @@
 
                     </div>
 
-
-                    {{-- Quantity --}}
-                    <div class="col-md-1">
-
-                        <label class="form-label">
-                            Qty
-                        </label>
-
-                        <input type="number"
-                               id="quantity"
-                               class="form-control"
-                               min="0"
-                               step="any">
-
-                    </div>
-
-
-                    {{-- Tray --}}
+                     {{-- Tray --}}
                     <div class="col-md-3">
 
                         <label class="form-label">
@@ -196,6 +179,24 @@
                         </div>
 
                     </div>
+                    
+                    {{-- Quantity --}}
+                    <div class="col-md-1">
+
+                        <label class="form-label">
+                            Qty
+                        </label>
+
+                        <input type="number"
+                               id="quantity"
+                               class="form-control"
+                               min="0"
+                               step="any">
+
+                    </div>
+
+
+                   
 
 
                     {{-- Price --}}

@@ -159,18 +159,7 @@
 
                     </div>
 
-                    {{-- Qty --}}
-                    <div class="col-md-1">
-
-                        <label class="form-label">
-                            Qty
-                        </label>
-
-                        <input type="number"
-                            id="quantity"
-                            class="form-control">
-
-                    </div>
+                    
 
                     {{-- Tray --}}
                    <div class="col-md-3">
@@ -192,6 +181,18 @@
                                 min="0"
                                 placeholder="Count">
                         </div>
+                    </div>
+                    {{-- Qty --}}
+                    <div class="col-md-1">
+
+                        <label class="form-label">
+                            Qty
+                        </label>
+
+                        <input type="number"
+                            id="quantity"
+                            class="form-control">
+
                     </div>
 
                     {{-- Price --}}

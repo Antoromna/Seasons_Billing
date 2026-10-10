@@ -325,11 +325,31 @@
                             </option>
 
                             @foreach($customers as $customer)
-                                <option value="{{ $customer->id }}">
+                                <option value="{{ $customer->id }}" data-due="{{ $customer->due_amount }}">
                                     {{ $customer->name }}
                                 </option>
                             @endforeach
                         </select>
+
+                        <!-- Customer Balance Display Card -->
+                        <div id="customer_balance_card" class="mt-2 d-none">
+                            <div class="p-2 px-3 rounded-3" style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(59, 130, 246, 0.35);">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.2); color: #60a5fa;">
+                                            <i class="bi bi-wallet2 fs-6"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-white-50 small" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Current Balance</div>
+                                            <div class="fw-bold fs-6 text-white" id="customer_balance_amount">₹ 0.00</div>
+                                        </div>
+                                    </div>
+                                    <div id="customer_balance_status">
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Due</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mb-3 d-none" id="sale_div">
@@ -358,8 +378,36 @@
 
                         <input type="number"
                                name="amount"
+                               id="payment_amount_input"
                                class="form-control"
+                               placeholder="Enter payment amount"
+                               step="0.01"
+                               min="0.01"
                                required>
+
+                        <!-- Live Payment Calculation Breakdown -->
+                        <div id="payment_calc_breakdown" class="mt-2 p-3 rounded-3 d-none" style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(16, 185, 129, 0.35);">
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 13px;">
+                                <span class="text-white-50"><i class="bi bi-person-badge me-1"></i> Current Balance:</span>
+                                <span class="fw-semibold text-white" id="calc_current_bal_val">₹ 0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 13px;">
+                                <span class="text-white-50"><i class="bi bi-arrow-down-circle text-success me-1"></i> Received Amount:</span>
+                                <span class="fw-semibold text-success" id="calc_received_amt_val">- ₹ 0.00</span>
+                            </div>
+                            <div class="border-top my-2" style="border-color: rgba(148, 163, 184, 0.2) !important;"></div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-white small" id="calc_remaining_label">
+                                    <i class="bi bi-hourglass-split text-warning me-1"></i> Balance After Payment:
+                                </span>
+                                <span class="fw-bold fs-5" id="calc_remaining_bal_val" style="color: #34d399;">
+                                    ₹ 0.00
+                                </span>
+                            </div>
+                            <div class="text-end mt-1" id="calc_settlement_badge">
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size: 11px;">Pending Due</span>
+                            </div>
+                        </div>
 
                     </div>
                     <div class="mb-3 d-none" id="discount_div">

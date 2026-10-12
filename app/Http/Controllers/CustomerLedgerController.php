@@ -153,7 +153,16 @@ public function bills($customerId)
 
             $payment = $entry['data'];
 
-            $ledgerBalance -= $payment->amount;
+            $discount = $payment->discount_amount ?? 0;
+            $totalCredited = $payment->amount + $discount;
+
+            $ledgerBalance -= $totalCredited;
+
+            $remarks = $payment->remarks;
+            if ($discount > 0) {
+                $discountNote = 'Discount: ₹' . number_format($discount, 2);
+                $remarks = $remarks ? $remarks . ' (' . $discountNote . ')' : $discountNote;
+            }
 
             $data[] = [
                 'sale_id' => null,
@@ -162,7 +171,7 @@ public function bills($customerId)
                 'received' => $payment->amount,
                 'pending' => 0,
                 'ledger_balance' => $ledgerBalance,
-                 'remarks' => $payment->remarks,
+                'remarks' => $remarks,
             ];
         }
     }
@@ -349,6 +358,13 @@ public function printLedger(Request $request, Customer $customer)
         else {
 
             $payment = $entry['data'];
+            $discount = $payment->discount_amount ?? 0;
+
+            $remarks = $payment->remarks;
+            if ($discount > 0) {
+                $discountNote = 'Discount: ₹' . number_format($discount, 2);
+                $remarks = $remarks ? $remarks . ' (' . $discountNote . ')' : $discountNote;
+            }
 
             $ledger[] = [
                 'date' => $payment->payment_date,
@@ -356,8 +372,8 @@ public function printLedger(Request $request, Customer $customer)
                 'type' => 'payment',
                 'sale' => null,
                 'debit' => 0,
-                'credit' => $payment->amount,
-                'remarks' => $payment->remarks,
+                'credit' => $payment->amount + $discount,
+                'remarks' => $remarks,
             ];
         }
     }

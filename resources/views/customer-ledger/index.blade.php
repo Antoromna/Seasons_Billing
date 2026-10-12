@@ -385,6 +385,22 @@
                                min="0.01"
                                required>
 
+                    </div>
+
+                    <div class="mb-3" id="discount_div">
+
+                        <label class="form-label">
+                            Discount Amount
+                        </label>
+
+                        <input type="number"
+                            name="discount_amount"
+                            id="discount_amount"
+                            class="form-control"
+                            value="0"
+                            min="0"
+                            step="0.01">
+
                         <!-- Live Payment Calculation Breakdown -->
                         <div id="payment_calc_breakdown" class="mt-2 p-3 rounded-3 d-none" style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(16, 185, 129, 0.35);">
                             <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 13px;">
@@ -394,6 +410,10 @@
                             <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 13px;">
                                 <span class="text-white-50"><i class="bi bi-arrow-down-circle text-success me-1"></i> Received Amount:</span>
                                 <span class="fw-semibold text-success" id="calc_received_amt_val">- ₹ 0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1 d-none" id="calc_discount_row" style="font-size: 13px;">
+                                <span class="text-white-50"><i class="bi bi-tag text-info me-1"></i> Discount:</span>
+                                <span class="fw-semibold text-info" id="calc_discount_amt_val">- ₹ 0.00</span>
                             </div>
                             <div class="border-top my-2" style="border-color: rgba(148, 163, 184, 0.2) !important;"></div>
                             <div class="d-flex justify-content-between align-items-center">
@@ -408,21 +428,6 @@
                                 <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size: 11px;">Pending Due</span>
                             </div>
                         </div>
-
-                    </div>
-                    <div class="mb-3 d-none" id="discount_div">
-
-                        <label class="form-label">
-                            Discount Amount
-                        </label>
-
-                        <input type="number"
-                            name="discount_amount"
-                            id="discount_amount"
-                            class="form-control"
-                            value="0"
-                            min="0"
-                            step="0.01">
 
                     </div>
 

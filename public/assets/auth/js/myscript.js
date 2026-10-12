@@ -654,19 +654,35 @@ function updatePaymentCalculation() {
 
     let amtVal = $('#payment_amount_input').val();
     let enteredAmount = parseFloat(amtVal);
+    let discVal = $('#discount_amount').val();
+    let discountAmount = parseFloat(discVal) || 0;
 
-    if (isNaN(enteredAmount) || enteredAmount <= 0) {
+    let hasAmount = !isNaN(enteredAmount) && enteredAmount > 0;
+    let hasDiscount = discountAmount > 0;
+
+    if (!hasAmount && !hasDiscount) {
         $('#payment_calc_breakdown').addClass('d-none');
         return;
     }
 
+    enteredAmount = hasAmount ? enteredAmount : 0;
+
     $('#payment_calc_breakdown').removeClass('d-none');
 
     let current = currentCustomerPaymentBalance;
-    let remaining = current - enteredAmount;
+    let totalDeduction = enteredAmount + discountAmount;
+    let remaining = current - totalDeduction;
 
     $('#calc_current_bal_val').text(formatIndianCurrency(current));
     $('#calc_received_amt_val').text('- ' + formatIndianCurrency(enteredAmount).replace('-', ''));
+
+    if (discountAmount > 0) {
+        $('#calc_discount_row').removeClass('d-none');
+        $('#calc_discount_amt_val').text('- ' + formatIndianCurrency(discountAmount).replace('-', ''));
+    } else {
+        $('#calc_discount_row').addClass('d-none');
+    }
+
     $('#calc_remaining_bal_val').text(formatIndianCurrency(remaining));
 
     if (Math.abs(remaining) < 0.001) {
@@ -684,13 +700,15 @@ function updatePaymentCalculation() {
     }
 }
 
-$(document).on('input keyup change', '#payment_amount_input', function () {
+$(document).on('input keyup change', '#payment_amount_input, #discount_amount', function () {
     updatePaymentCalculation();
 });
 
 $('#paymentModal').on('hidden.bs.modal', function () {
     $('#customer_id_payment').val('');
     $('#payment_amount_input').val('');
+    $('#discount_amount').val('0');
+    $('#calc_discount_row').addClass('d-none');
     $('#customer_balance_card').addClass('d-none');
     $('#payment_calc_breakdown').addClass('d-none');
     currentCustomerPaymentBalance = 0;
@@ -741,22 +759,37 @@ $('#customer_id_payment').on('change', function () {
     });
 
     $.get('/customer/' + customerId + '/sales', function (sales) {
+        window.lastLoadedCustomerSales = sales;
 
         let options = '<option value="">Select Bill</option>';
 
         $.each(sales, function (i, sale) {
 
-            let pending = sale.net_amount - sale.paid_amount;
+            let pending = sale.pending !== undefined ? sale.pending : (sale.net_amount - sale.paid_amount);
+            let extraInfo = '';
+            if (sale.credit_applied && sale.credit_applied > 0) {
+                extraInfo = ` (Bill ₹${Number(sale.bill_pending).toFixed(0)} - Credit ₹${Number(sale.credit_applied).toFixed(0)})`;
+            }
 
             options += `
                 <option value="${sale.id}">
-                    ${sale.bill_no} - Pending ₹${pending}
+                    ${sale.bill_no} - Pending ₹${Number(pending).toFixed(2)}${extraInfo}
                 </option>
             `;
         });
 
         $('#sale_id').html(options);
     });
+});
+
+$(document).on('change', '#sale_id', function () {
+    let selectedId = $(this).val();
+    if (selectedId && window.lastLoadedCustomerSales) {
+        let selectedSale = window.lastLoadedCustomerSales.find(s => s.id == selectedId);
+        if (selectedSale && selectedSale.pending !== undefined) {
+            $('#payment_amount_input').val(Number(selectedSale.pending).toFixed(2)).trigger('input');
+        }
+    }
 });
 $(document).on('click', '.viewBill', function () {
 
@@ -1129,20 +1162,4 @@ $(document).on('click', '#printLedgerBtn', function () {
         '&to_date=' + toDate;
 
     window.open(url, '_blank');
-});
-$('#payment_type').change(function () {
-
-    if ($(this).val() == 'bill') {
-
-        $('#sale_div').removeClass('d-none');
-        $('#discount_div').removeClass('d-none');
-
-    } else {
-
-        $('#sale_div').addClass('d-none');
-        $('#discount_div').addClass('d-none');
-
-        $('#discount_amount').val(0);
-    }
-
 });

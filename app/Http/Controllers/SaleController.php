@@ -50,7 +50,8 @@ class SaleController extends Controller
         }
 
         $sales = $query
-            ->latest()
+            ->orderByDesc('bill_date')
+            ->orderByDesc('id')
             ->get();
 
         $customers = Customer::where('status', 1)

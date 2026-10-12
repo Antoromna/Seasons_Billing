@@ -56,7 +56,8 @@
                     <tr>
                         <th>S.No</th>
                         <th>Customer</th>
-                        <th>Big/Small [Balance]</th>
+                        <th>Big Tray</th>
+                        <th>Small Tray</th>
                         <th class="no-print">Action</th>
                     </tr>
                 </thead>
@@ -73,11 +74,13 @@
                                 {{ $row['customer']->name }}
                             </td>
 
-                           <td>
+                            <td>
                                 <span class="badge text-bg-primary">
                                     {{ $row['big_balance'] }}
                                 </span>
-                                /
+                            </td>
+
+                            <td>
                                 <span class="badge text-bg-success">
                                     {{ $row['small_balance'] }}
                                 </span>
@@ -134,7 +137,7 @@
                     @empty
 
                         <tr>
-                            <td colspan="8" class="text-center py-4">
+                            <td colspan="5" class="text-center py-4">
                                 No Records Found
                             </td>
                         </tr>
@@ -153,9 +156,13 @@
 
                             <td>
                                 {{ $summary->sum('big_balance') }}
-                                /
+                            </td>
+
+                            <td>
                                 {{ $summary->sum('small_balance') }}
                             </td>
+
+                            <td class="no-print"></td>
                         </tr>
                     </tfoot>
 
@@ -512,6 +519,10 @@ function printContent(title, content) {
                     font-weight: bold;
                     background: #f2f2f2;
                 }
+
+                .no-print {
+                    display: none !important;
+                }
             </style>
         </head>
 
@@ -548,13 +559,15 @@ document.getElementById('printTraySummary').addEventListener('click', function (
         '#traySummaryPrint table'
     ).cloneNode(true);
 
-    // Remove Action column
+    // Remove Action column (.no-print header and cells)
+    table.querySelectorAll('.no-print').forEach(function (el) {
+        el.remove();
+    });
+
+    // Fallback: remove last cell if any row still has more than 4 columns
     table.querySelectorAll('tr').forEach(function (row) {
-
         const cells = row.querySelectorAll('th, td');
-
-        // Remove Action column only from rows containing 6 columns
-        if (cells.length === 6) {
+        if (cells.length > 4) {
             cells[cells.length - 1].remove();
         }
     });

@@ -794,7 +794,11 @@ $(document).on('keyup change', '.qty, .price', function () {
 //pagination
 if ($.fn.DataTable) {
     $('.DataTable').DataTable({
-        paging: true
+        paging: true,
+        order: [],
+        columnDefs: [
+            { orderable: false, targets: [0, -1] }
+        ]
     });
 }
 

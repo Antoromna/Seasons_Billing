@@ -71,10 +71,11 @@
 
     <button type="button"
             class="btn btn-success"
-            id="newBillBtn">
+            id="newBillBtn"
+            title="Shortcut: F2, Alt+N, or Tab from Add/Product">
 
         <i class="bi bi-plus-circle me-1"></i>
-        New Bill
+        New Bill <span class="badge bg-white text-success ms-1">F2</span>
 
     </button>
 
@@ -117,9 +118,11 @@
 
                     <button type="submit"
         class="btn btn-primary"
-        id="saveBtn">
+        id="saveBtn"
+        title="Shortcut: F10 or Alt+S">
 
-    Save All Bills
+    <i class="bi bi-check2-circle me-1"></i>
+    Save All Bills <span class="badge bg-white text-primary ms-1">F10</span>
 
 </button>
 
@@ -515,6 +518,17 @@ document.addEventListener('DOMContentLoaded', function () {
             'Bill created:',
             billNumber
         );
+
+        /*
+        | Auto-focus Product of the newly created bill
+        */
+        const newProductSelect = actualBill.querySelector('.productSelect');
+        if (newProductSelect) {
+            actualBill.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(function () {
+                newProductSelect.focus();
+            }, 80);
+        }
     }
 
 
@@ -722,6 +736,7 @@ document.addEventListener('DOMContentLoaded', function () {
         */
 
         // Product Select Enter -> move to Tray Type (if enabled) or Quantity
+        // Product Select Tab (when empty) -> move to New Bill button
         productSelect.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -745,6 +760,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     try {
                         this.showPicker();
                     } catch (err) {}
+                }
+            } else if (e.key === 'Tab' && !e.shiftKey && !this.value) {
+                const tbody = billSection.querySelector('.saleTable tbody');
+                if (tbody && tbody.children.length > 0) {
+                    e.preventDefault();
+                    newBillBtn.focus();
                 }
             }
         });
@@ -832,12 +853,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Add Button Enter -> trigger click to add product
+        // Add Button Enter -> trigger click to add product | Tab -> move to New Bill button
         addProductBtn.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 e.stopPropagation();
                 this.click();
+            } else if (e.key === 'Tab' && !e.shiftKey) {
+                e.preventDefault();
+                newBillBtn.focus();
             }
         });
     }
@@ -1327,6 +1351,37 @@ document.addEventListener('DOMContentLoaded', function () {
             createBill();
         }
     );
+
+    newBillBtn.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            createBill();
+        }
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Global Keyboard Shortcuts (F2 / Alt+N for New Bill, F10 / Alt+S for Save)
+    |--------------------------------------------------------------------------
+    */
+    document.addEventListener('keydown', function (e) {
+        // F2 or Alt+N -> New Bill
+        if (e.key === 'F2' || (e.altKey && (e.key === 'n' || e.key === 'N'))) {
+            e.preventDefault();
+            newBillBtn.click();
+            return;
+        }
+
+        // F10 or Alt+S -> Save All Bills
+        if (e.key === 'F10' || (e.altKey && (e.key === 's' || e.key === 'S'))) {
+            e.preventDefault();
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn) {
+                saveBtn.click();
+            }
+            return;
+        }
+    });
 
 
     

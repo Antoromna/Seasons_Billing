@@ -25,4 +25,8 @@ public function openingBalances()
 {
     return $this->hasMany(CustomerOpeningBalance::class);
 }
+public function sales()
+{
+    return $this->hasMany(Sale::class);
+}
 }

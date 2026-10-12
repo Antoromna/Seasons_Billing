@@ -89,7 +89,9 @@ let rowCount = 1;
 // Product select
 $('#productSelect').on('change', function () {
 
-    let productId = this.tomselect.getValue();
+    if (!$('#customer_id').length) return;
+
+    let productId = this.tomselect ? this.tomselect.getValue() : $(this).val();
 
     let selected = $('#productSelect option[value="' + productId + '"]');
 
@@ -101,22 +103,22 @@ $('#productSelect').on('change', function () {
 
     if (trayRequired === 0) {
 
-    $('#trayType')
-        .val('No Tray')
-        .prop('disabled', true);
+        $('#trayType')
+            .val('No Tray')
+            .prop('disabled', true);
 
-    $('#trayCount')
-        .val('')
-        .prop('disabled', true);
+        $('#trayCount')
+            .val('')
+            .prop('disabled', true);
 
-} else {
+    } else {
 
-    $('#trayType')
-        .prop('disabled', false);
+        $('#trayType')
+            .prop('disabled', false);
 
-    // Enable/disable count based on selected tray type
-    updateTrayCountState();
-}
+        // Enable/disable count based on selected tray type
+        updateTrayCountState();
+    }
 
     let unit = selected.data('unit') || '';
 
@@ -125,7 +127,14 @@ $('#productSelect').on('change', function () {
 
     calculateLineTotal();
 
-    $('#quantity').focus();
+    if (trayRequired === 1 && !$('#trayType').prop('disabled')) {
+        $('#trayType').focus();
+        if (typeof document.getElementById('trayType')?.showPicker === 'function') {
+            try { document.getElementById('trayType').showPicker(); } catch (e) {}
+        }
+    } else {
+        $('#quantity').focus().select();
+    }
 });
 function updateTrayCountState()
 {
@@ -146,10 +155,20 @@ function updateTrayCountState()
 }
 $('#trayType').on('change', function () {
 
+    if (!$('#customer_id').length) return;
+
     updateTrayCountState();
+
+    if ($(this).val() !== 'No Tray') {
+        $('#trayCount').val('').focus().select();
+    } else {
+        $('#quantity').focus().select();
+    }
 
 });
 $('#productSelect').on('focus', function () {
+
+    if (!$('#customer_id').length) return;
 
     if ($('#customer_id').val() == '') {
 
@@ -167,6 +186,8 @@ $('#productSelect').on('focus', function () {
 // Total calculate
 $('#quantity, #price').on('keyup change', function () {
 
+    if (!$('#customer_id').length) return;
+
     calculateLineTotal();
 });
 
@@ -183,6 +204,8 @@ function calculateLineTotal()
 
 // Add product button
 $('#addProductBtn').on('click', function () {
+
+    if (!$('#customer_id').length) return;
 
     addProductRow();
 });
@@ -458,6 +481,10 @@ function moveOnEnter(current, next)
             return;
         }
 
+        if (!$('#customer_id').length) {
+            return;
+        }
+
         e.preventDefault();
 
         if (typeof next === 'function') {
@@ -467,20 +494,49 @@ function moveOnEnter(current, next)
         }
     });
 }
-moveOnEnter('#quantity', function () {
-
-    if ($('#trayType').prop('disabled')) {
-        $('#price').focus();
+moveOnEnter('#trayType', function () {
+    let trayType = $('#trayType').val();
+    if (trayType !== 'No Tray' && !$('#trayCount').prop('disabled')) {
+        $('#trayCount').focus().select();
     } else {
-        $('#trayType').focus();
+        $('#quantity').focus().select();
     }
 });
 
-moveOnEnter('#trayType', '#trayCount');
+moveOnEnter('#trayCount', function () {
+    let trayType = $('#trayType').val();
+    if (trayType !== 'No Tray') {
+        let countVal = parseInt($('#trayCount').val()) || 0;
+        if (countVal <= 0) {
+            toastr.error('Please enter tray quantity');
+            $('#trayCount').focus().select();
+            return;
+        }
+    }
+    $('#quantity').focus().select();
+});
 
-moveOnEnter('#trayCount', '#price');
+moveOnEnter('#quantity', function () {
+    let qtyVal = parseFloat($('#quantity').val()) || 0;
+    if (qtyVal <= 0) {
+        toastr.error('Enter valid quantity');
+        $('#quantity').focus().select();
+        return;
+    }
+    $('#price').focus().select();
+});
 
 moveOnEnter('#price', function () {
+    let priceVal = parseFloat($('#price').val()) || 0;
+    if (priceVal <= 0) {
+        toastr.error('Enter valid price');
+        $('#price').focus().select();
+        return;
+    }
+    $('#addProductBtn').focus();
+});
+
+moveOnEnter('#addProductBtn', function () {
     addProductRow();
 });
 //customer-ledger
@@ -870,6 +926,9 @@ function printProductReport() {
 //sale-previous balance
 $(document).ready(function () {
      updateTrayCountState();
+     if ($('#saleTable').length) {
+         calculateTotals();
+     }
 
     $('#customer_id').change(function () {
 
@@ -960,6 +1019,63 @@ $(document).ready(function () {
     }
 
     setupCustomerTomSelect();
+
+    function moveToAfterProductSelect() {
+        if (!$('#customer_id').length) return;
+        if (!$('#trayType').prop('disabled')) {
+            $('#trayType').focus();
+            if (typeof document.getElementById('trayType')?.showPicker === 'function') {
+                try { document.getElementById('trayType').showPicker(); } catch (e) {}
+            }
+        } else {
+            $('#quantity').focus().select();
+        }
+    }
+
+    $(document).on('keydown', '.ts-wrapper:has(#productSelect) input, #productSelect ~ .ts-wrapper input', function (e) {
+        if (!$('#customer_id').length) return;
+        if (e.key === 'Enter') {
+            setTimeout(function () {
+                const prodEl = document.getElementById('productSelect');
+                const val = prodEl?.tomselect ? prodEl.tomselect.getValue() : $(prodEl).val();
+                if (val) {
+                    moveToAfterProductSelect();
+                }
+            }, 60);
+        }
+    });
+
+    $('#productSelect').on('keydown', function (e) {
+        if (!$('#customer_id').length) return;
+        if (e.key === 'Enter' && $(this).val()) {
+            e.preventDefault();
+            moveToAfterProductSelect();
+        }
+    });
+
+    function setupProductTomSelect() {
+        if (!$('#customer_id').length) return;
+        const prodEl = document.getElementById('productSelect');
+        if (prodEl && prodEl.tomselect) {
+            const ts = prodEl.tomselect;
+            if (ts.control_input && !ts.control_input._enterBound) {
+                ts.control_input._enterBound = true;
+                ts.control_input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        setTimeout(function () {
+                            if (ts.getValue()) {
+                                moveToAfterProductSelect();
+                            }
+                        }, 60);
+                    }
+                });
+            }
+        } else if (prodEl) {
+            setTimeout(setupProductTomSelect, 100);
+        }
+    }
+
+    setupProductTomSelect();
 
 });
 

@@ -114,6 +114,12 @@ class CustomerController extends Controller
     {
         $customer = Customer::findOrFail($id);
 
+        if ($customer->sales()->exists()) {
+            return redirect()
+                ->route('customers.index')
+                ->with('error', 'Cannot delete customer "' . $customer->name . '" because they have existing sales bills.');
+        }
+
         $customer->delete();
 
         return redirect()

@@ -622,9 +622,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     trayType.disabled = false;
 
+                    trayType.focus();
+                    if (typeof trayType.showPicker === 'function') {
+                        try {
+                            trayType.showPicker();
+                        } catch (err) {}
+                    }
+
                 } else {
 
                     trayType.disabled = true;
+
+                    quantity.focus();
+                    quantity.select();
 
                 }
 
@@ -632,10 +642,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 calculateLineTotal(
                     billSection
                 );
-
-
-                quantity.focus();
-                quantity.select();
             }
         );
 
@@ -655,6 +661,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     trayCount.value = '';
 
                     trayCount.disabled = true;
+
+                    quantity.focus();
+                    quantity.select();
 
                 } else {
 
@@ -708,51 +717,34 @@ document.addEventListener('DOMContentLoaded', function () {
         /*
         |--------------------------------------------------------------------------
         | Enter Key Navigation (Line by line, skipping disabled / auto-filled fields)
+        | Sequence: Product -> Tray Type (or Qty) -> Tray Count -> Qty -> Price -> Add
         |--------------------------------------------------------------------------
         */
 
-        // Product Select Enter -> move to Quantity
+        // Product Select Enter -> move to Tray Type (if enabled) or Quantity
         productSelect.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 e.stopPropagation();
 
                 if (this.value) {
-                    quantity.focus();
-                    quantity.select();
+                    if (!trayType.disabled) {
+                        trayType.focus();
+                        if (typeof trayType.showPicker === 'function') {
+                            try {
+                                trayType.showPicker();
+                            } catch (err) {}
+                        }
+                    } else {
+                        quantity.focus();
+                        quantity.select();
+                    }
                 } else if (this.tomselect) {
                     this.tomselect.open();
                 } else if (typeof this.showPicker === 'function') {
                     try {
                         this.showPicker();
                     } catch (err) {}
-                }
-            }
-        });
-
-        // Quantity Enter -> move to Tray Type (if enabled) or Price (skipping disabled tray)
-        quantity.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                e.stopPropagation();
-
-                const qtyVal = parseFloat(this.value) || 0;
-                if (qtyVal <= 0) {
-                    showError('Enter valid quantity');
-                    this.focus();
-                    return;
-                }
-
-                if (!trayType.disabled) {
-                    trayType.focus();
-                    if (typeof trayType.showPicker === 'function') {
-                        try {
-                            trayType.showPicker();
-                        } catch (err) {}
-                    }
-                } else {
-                    price.focus();
-                    price.select();
                 }
             }
         });
@@ -766,7 +758,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Tray Type Enter -> move to Tray Count (if enabled) or Price (skipping disabled count if No Tray)
+        // Tray Type Enter -> move to Tray Count (if not No Tray) or Quantity (if No Tray)
         trayType.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -779,13 +771,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     trayCount.value = '';
                     trayCount.disabled = true;
-                    price.focus();
-                    price.select();
+                    quantity.focus();
+                    quantity.select();
                 }
             }
         });
 
-        // Tray Count Enter -> move to Price
+        // Tray Count Enter -> move to Quantity
         trayCount.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -800,12 +792,30 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
+                quantity.focus();
+                quantity.select();
+            }
+        });
+
+        // Quantity Enter -> move to Price
+        quantity.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const qtyVal = parseFloat(this.value) || 0;
+                if (qtyVal <= 0) {
+                    showError('Enter valid quantity');
+                    this.focus();
+                    return;
+                }
+
                 price.focus();
                 price.select();
             }
         });
 
-        // Price Enter -> move to Add button (skipping readonly total)
+        // Price Enter -> move to Add button
         price.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();

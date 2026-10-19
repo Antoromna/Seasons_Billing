@@ -265,7 +265,7 @@
     </div>
 </div>
 <div class="modal fade" id="paymentModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 680px;">
         <div class="modal-content">
 
             <form action="{{ route('customer-payment.store') }}"
@@ -273,9 +273,9 @@
 
                 @csrf
 
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">
-                        Receive Payment
+                <div class="modal-header py-3 px-4 bg-success text-white">
+                    <h5 class="modal-title fw-bold mb-0">
+                        <i class="bi bi-cash-stack me-2"></i> Receive Payment
                     </h5>
 
                     <button type="button"
@@ -283,187 +283,178 @@
                             data-bs-dismiss="modal"></button>
                 </div>
 
-                <div class="modal-body">
+                <div class="modal-body px-4 py-3">
 
                     <input type="hidden"
                            name="customer_id"
                            id="payment_customer_id">
 
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Payment Type
-                        </label>
-
-                        <select name="payment_type"
-                                id="payment_type"
-                                class="form-select">
-
-                            <option value="general">
-                                General Payment
-                            </option>
-
-                            <option value="bill">
-                                Bill Payment
-                            </option>
-
-                        </select>
-
-                    </div>
-                     <div class="mb-3">
-                        <label class="form-label">
-                            Customer
-                        </label>
-
-                        <select name="customer_id"
-                                id="customer_id_payment"
-                                class="form-select"
-                                required>
-
-                            <option value="">
-                                Select Customer
-                            </option>
-
-                            @foreach($allCustomers ?? $customers as $customer)
-                                <option value="{{ $customer->id }}" data-due="{{ $customer->due_amount }}">
-                                    {{ $customer->name }}
+                    <!-- Row 1: Payment Type & Customer in one row -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-white-50 mb-1 fw-semibold">
+                                Payment Type
+                            </label>
+                            <select name="payment_type"
+                                    id="payment_type"
+                                    class="form-select">
+                                <option value="general">
+                                    General Payment
                                 </option>
-                            @endforeach
-                        </select>
+                                <option value="bill">
+                                    Bill Payment
+                                </option>
+                            </select>
+                        </div>
 
-                        <!-- Customer Balance Display Card -->
-                        <div id="customer_balance_card" class="mt-2 d-none">
-                            <div class="p-2 px-3 rounded-3" style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(59, 130, 246, 0.35);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.2); color: #60a5fa;">
-                                            <i class="bi bi-wallet2 fs-6"></i>
-                                        </div>
-                                        <div>
-                                            <div class="text-white-50 small" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Current Balance</div>
-                                            <div class="fw-bold fs-6 text-white" id="customer_balance_amount">₹ 0.00</div>
-                                        </div>
-                                    </div>
-                                    <div id="customer_balance_status">
-                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Due</span>
-                                    </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-white-50 mb-1 fw-semibold">
+                                Customer
+                            </label>
+                            <select name="customer_id"
+                                    id="customer_id_payment"
+                                    class="form-select"
+                                    required>
+                                <option value="">
+                                    Select Customer
+                                </option>
+                                @foreach($allCustomers ?? $customers as $customer)
+                                    <option value="{{ $customer->id }}" data-due="{{ $customer->due_amount }}">
+                                        {{ $customer->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Customer Balance Display Card -->
+                    <div id="customer_balance_card" class="mb-3 d-none">
+                        <div class="p-2.5 px-3 rounded-3 d-flex justify-content-between align-items-center" style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(59, 130, 246, 0.35);">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.2); color: #60a5fa;">
+                                    <i class="bi bi-wallet2 fs-6"></i>
                                 </div>
+                                <div>
+                                    <span class="text-white-50 small" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Current Balance:</span>
+                                    <span class="fw-bold fs-6 text-white ms-1" id="customer_balance_amount">₹ 0.00</span>
+                                </div>
+                            </div>
+                            <div id="customer_balance_status">
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Due</span>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Bill selection (shown only if Bill Payment is selected) -->
                     <div class="mb-3 d-none" id="sale_div">
-
-                        <label class="form-label">
+                        <label class="form-label text-white-50 mb-1 fw-semibold">
                             Select Bill
                         </label>
-
                         <select name="sale_id"
                                 id="sale_id"
                                 class="form-select">
-
                             <option value="">
                                 Select Bill
                             </option>
-
                         </select>
-
                     </div>
 
-                    <div class="mb-3">
+                    <!-- Row 2: Amount & Discount Amount in one row -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-white-50 mb-1 fw-semibold">
+                                Amount (₹)
+                            </label>
+                            <input type="number"
+                                   name="amount"
+                                   id="payment_amount_input"
+                                   class="form-control"
+                                   placeholder="Enter payment amount"
+                                   step="0.01"
+                                   min="0.01"
+                                   required>
+                        </div>
 
-                        <label class="form-label">
-                            Amount
-                        </label>
-
-                        <input type="number"
-                               name="amount"
-                               id="payment_amount_input"
-                               class="form-control"
-                               placeholder="Enter payment amount"
-                               step="0.01"
-                               min="0.01"
-                               required>
-
+                        <div class="col-md-6" id="discount_div">
+                            <label class="form-label text-white-50 mb-1 fw-semibold">
+                                Discount Amount (₹)
+                            </label>
+                            <input type="number"
+                                   name="discount_amount"
+                                   id="discount_amount"
+                                   class="form-control"
+                                   value="0"
+                                   min="0"
+                                   step="0.01">
+                        </div>
                     </div>
 
-                    <div class="mb-3" id="discount_div">
-
-                        <label class="form-label">
-                            Discount Amount
-                        </label>
-
-                        <input type="number"
-                            name="discount_amount"
-                            id="discount_amount"
-                            class="form-control"
-                            value="0"
-                            min="0"
-                            step="0.01">
-
-                        <!-- Live Payment Calculation Breakdown -->
-                        <div id="payment_calc_breakdown" class="mt-2 p-3 rounded-3 d-none" style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(16, 185, 129, 0.35);">
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 13px;">
+                    <!-- Live Payment Calculation Breakdown -->
+                    <div id="payment_calc_breakdown" class="p-3 rounded-3 mb-3 d-none" style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(16, 185, 129, 0.35);">
+                        <div class="row g-2 mb-2" style="font-size: 13px;">
+                            <div class="col-sm-6 d-flex justify-content-between align-items-center pe-sm-3 border-end" style="border-color: rgba(148, 163, 184, 0.2) !important;">
                                 <span class="text-white-50"><i class="bi bi-person-badge me-1"></i> Current Balance:</span>
-                                <span class="fw-semibold text-white" id="calc_current_bal_val">₹ 0.00</span>
+                                <span class="fw-semibold text-white fs-6" id="calc_current_bal_val">₹ 0.00</span>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 13px;">
-                                <span class="text-white-50"><i class="bi bi-arrow-down-circle text-success me-1"></i> Received Amount:</span>
-                                <span class="fw-semibold text-success" id="calc_received_amt_val">- ₹ 0.00</span>
+                            <div class="col-sm-6 d-flex justify-content-between align-items-center ps-sm-3">
+                                <span class="text-white-50"><i class="bi bi-arrow-down-circle me-1" style="color: #38bdf8 !important;"></i> Received Amount:</span>
+                                <span class="fw-bold fs-6" id="calc_received_amt_val" style="color: #38bdf8 !important;">- ₹ 0.00</span>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center mb-1 d-none" id="calc_discount_row" style="font-size: 13px;">
-                                <span class="text-white-50"><i class="bi bi-tag text-info me-1"></i> Discount:</span>
-                                <span class="fw-semibold text-info" id="calc_discount_amt_val">- ₹ 0.00</span>
-                            </div>
-                            <div class="border-top my-2" style="border-color: rgba(148, 163, 184, 0.2) !important;"></div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-bold text-white small" id="calc_remaining_label">
-                                    <i class="bi bi-hourglass-split text-warning me-1"></i> Balance After Payment:
-                                </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2 d-none" id="calc_discount_row" style="font-size: 13px;">
+                            <span class="text-white-50"><i class="bi bi-tag text-warning me-1"></i> Discount:</span>
+                            <span class="fw-semibold text-warning fs-6" id="calc_discount_amt_val">- ₹ 0.00</span>
+                        </div>
+                        <div class="border-top my-2" style="border-color: rgba(148, 163, 184, 0.2) !important;"></div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-white" id="calc_remaining_label" style="font-size: 14px;">
+                                <i class="bi bi-hourglass-split text-warning me-1"></i> Balance After Payment:
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
                                 <span class="fw-bold fs-5" id="calc_remaining_bal_val" style="color: #34d399;">
                                     ₹ 0.00
                                 </span>
-                            </div>
-                            <div class="text-end mt-1" id="calc_settlement_badge">
-                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size: 11px;">Pending Due</span>
+                                <span id="calc_settlement_badge">
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">Pending Due</span>
+                                </span>
                             </div>
                         </div>
-
                     </div>
 
+                    <!-- Payment Date -->
                     <div class="mb-3">
-
-                        <label class="form-label">
+                        <label class="form-label text-white-50 mb-1 fw-semibold">
                             Payment Date
                         </label>
-
                         <input type="date"
                                name="payment_date"
                                value="{{ date('Y-m-d') }}"
                                class="form-control">
-
                     </div>
 
+                    <!-- Remarks in separate row as previous -->
                     <div class="mb-3">
-
-                        <label class="form-label">
+                        <label class="form-label text-white-50 mb-1 fw-semibold">
                             Remarks
                         </label>
-
                         <textarea name="remarks"
-                                  class="form-control"></textarea>
-
+                                  rows="2"
+                                  class="form-control"
+                                  placeholder="Optional remarks / notes"></textarea>
                     </div>
 
                 </div>
 
-                <div class="modal-footer">
-
-                    <button type="submit"
-                            class="btn btn-success">
-                        Save Payment
+                <div class="modal-footer py-3 px-4 border-top-0 d-flex justify-content-end gap-2">
+                    <button type="button"
+                            class="btn btn-secondary px-3"
+                            data-bs-dismiss="modal">
+                        Cancel
                     </button>
-
+                    <button type="submit"
+                            class="btn btn-success px-4 fw-semibold">
+                        <i class="bi bi-check2-circle me-1"></i> Save Payment
+                    </button>
                 </div>
 
             </form>

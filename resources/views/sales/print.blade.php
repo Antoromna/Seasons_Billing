@@ -133,7 +133,7 @@
         }
 
         .empty-row td{
-            height:30px;
+            height:18px;
             border-left:2px solid #000;
             border-right:2px solid #000;
             border-top:none;
@@ -206,8 +206,9 @@
                 break-after: page;
             }
 
-            .invoice{
-                page-break-inside: avoid;
+            .footer-settlement{
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
         }
 
@@ -436,6 +437,7 @@
             }
         @endphp
 
+        <div class="footer-settlement" style="page-break-inside: avoid; break-inside: avoid;">
             <table class="no-border" style="margin-top:5px;">
                 <tr>
 
@@ -547,6 +549,7 @@
         </tr>
         </table>
         <div style="border-top:2px solid #2156a5; margin-top:3px;"></div>
+        </div>
         
 
     </div>

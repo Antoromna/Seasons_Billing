@@ -41,7 +41,7 @@
 
             <div class="d-flex align-items-center gap-2">
                 <form method="GET" action="{{ route('customer-ledger.index') }}" class="d-flex align-items-center gap-1">
-                    <input type="text" name="search" class="form-control form-control-sm" placeholder="Search customer..." value="{{ request('search') }}" style="min-width: 220px; border-radius: 8px;">
+                    <input type="text" name="search" class="form-control form-control-sm table-search" placeholder="Search customer..." value="{{ request('search') }}" data-table-search="customerLedgerTable" style="min-width: 220px; border-radius: 8px;">
                     <button class="btn btn-primary btn-sm rounded-2" type="submit">
                         <i class="bi bi-search"></i>
                     </button>
@@ -51,7 +51,7 @@
 
         <div class="table-responsive">
 
-            <table class="table align-middle mb-0">
+            <table class="table align-middle mb-0" id="customerLedgerTable">
 
                 <thead>
                     <tr>
@@ -86,7 +86,7 @@
                     @empty
 
                     <tr>
-                        <td colspan="5" class="text-center py-4">
+                        <td colspan="4" class="text-center py-4">
                             No Customers Found
                         </td>
                     </tr>
@@ -203,7 +203,7 @@
                                 Select Customer
                             </option>
 
-                            @foreach($customers as $customer)
+                            @foreach($allCustomers ?? $customers as $customer)
                                 <option value="{{ $customer->id }}">
                                     {{ $customer->name }}
                                 </option>
@@ -324,7 +324,7 @@
                                 Select Customer
                             </option>
 
-                            @foreach($customers as $customer)
+                            @foreach($allCustomers ?? $customers as $customer)
                                 <option value="{{ $customer->id }}" data-due="{{ $customer->due_amount }}">
                                     {{ $customer->name }}
                                 </option>

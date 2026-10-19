@@ -10,37 +10,54 @@ use App\Models\CustomerOpeningBalance;
 
 class CustomerLedgerController extends Controller
 {
-public function index()
-{
-    $customers = Customer::latest()->get();
+    public function index(Request $request)
+    {
+        $allCustomers = Customer::all();
 
-    foreach ($customers as $customer) {
+        foreach ($allCustomers as $customer) {
 
-        $openingBalance = CustomerOpeningBalance::where(
-                'customer_id',
-                $customer->id
-            )->sum('amount');
+            $openingBalance = CustomerOpeningBalance::where(
+                    'customer_id',
+                    $customer->id
+                )->sum('amount');
 
-        $salesAmount = Sale::where(
-                'customer_id',
-                $customer->id
-            )->sum('net_amount');
+            $salesAmount = Sale::where(
+                    'customer_id',
+                    $customer->id
+                )->sum('net_amount');
 
-       $payment = CustomerPayment::where('customer_id', $customer->id)
-            ->selectRaw('SUM(amount) as amount, SUM(discount_amount) as discount')
-            ->first();
+            $payment = CustomerPayment::where('customer_id', $customer->id)
+                ->selectRaw('SUM(amount) as amount, SUM(discount_amount) as discount')
+                ->first();
 
-        $paymentsReceived = $payment->amount ?? 0;
-        $discountReceived = $payment->discount ?? 0;
+            $paymentsReceived = $payment->amount ?? 0;
+            $discountReceived = $payment->discount ?? 0;
 
-        $customer->due_amount =
-            $openingBalance
-            + $salesAmount
-            - ($paymentsReceived + $discountReceived);
+            $customer->due_amount =
+                $openingBalance
+                + $salesAmount
+                - ($paymentsReceived + $discountReceived);
+        }
+
+        // Sort all customers alphabetically (case-insensitive)
+        $allCustomers = $allCustomers->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->values();
+
+        // Only show customers where amount to receive is greater than zero
+        $customers = $allCustomers->filter(function ($customer) {
+            return (float) $customer->due_amount > 0;
+        });
+
+        if ($request->filled('search')) {
+            $searchTerm = strtolower(trim($request->search));
+            $customers = $customers->filter(function ($customer) use ($searchTerm) {
+                return str_contains(strtolower($customer->name), $searchTerm);
+            });
+        }
+
+        $customers = $customers->values();
+
+        return view('customer-ledger.index', compact('customers', 'allCustomers'));
     }
-
-    return view('customer-ledger.index', compact('customers'));
-}
 
 public function bills($customerId)
 {
@@ -178,37 +195,42 @@ public function bills($customerId)
 
     return response()->json($data);
 }
-public function print()
-{
-    $customers = Customer::orderBy('name')->get();
+    public function print()
+    {
+        $customers = Customer::all();
 
-    foreach ($customers as $customer) {
+        foreach ($customers as $customer) {
 
-        $openingBalance = CustomerOpeningBalance::where(
-            'customer_id',
-            $customer->id
-        )->sum('amount');
+            $openingBalance = CustomerOpeningBalance::where(
+                'customer_id',
+                $customer->id
+            )->sum('amount');
 
-        $salesAmount = Sale::where(
-            'customer_id',
-            $customer->id
-        )->sum('net_amount');
+            $salesAmount = Sale::where(
+                'customer_id',
+                $customer->id
+            )->sum('net_amount');
 
-        $payment = CustomerPayment::where('customer_id', $customer->id)
-            ->selectRaw('SUM(amount) as amount, SUM(discount_amount) as discount')
-            ->first();
+            $payment = CustomerPayment::where('customer_id', $customer->id)
+                ->selectRaw('SUM(amount) as amount, SUM(discount_amount) as discount')
+                ->first();
 
-        $paymentsReceived = $payment->amount ?? 0;
-        $discountReceived = $payment->discount ?? 0;
+            $paymentsReceived = $payment->amount ?? 0;
+            $discountReceived = $payment->discount ?? 0;
 
-        $customer->due_amount =
-            $openingBalance +
-            $salesAmount -
-            ($paymentsReceived + $discountReceived);
+            $customer->due_amount =
+                $openingBalance +
+                $salesAmount -
+                ($paymentsReceived + $discountReceived);
+        }
+
+        // Only show customers where amount to receive is greater than zero, sorted alphabetically
+        $customers = $customers->filter(function ($customer) {
+            return (float) $customer->due_amount > 0;
+        })->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->values();
+
+        return view('customer-ledger.print', compact('customers'));
     }
-
-    return view('customer-ledger.print', compact('customers'));
-}
 
 
 public function printLedger(Request $request, Customer $customer)

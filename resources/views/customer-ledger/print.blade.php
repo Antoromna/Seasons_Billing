@@ -63,7 +63,7 @@
 
             @php $total = 0; @endphp
 
-            @foreach($customers as $key => $customer)
+            @forelse($customers as $key => $customer)
 
                 @php $total += $customer->due_amount; @endphp
 
@@ -75,7 +75,11 @@
                     </td>
                 </tr>
 
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="3" align="center">No customers with pending dues found.</td>
+                </tr>
+            @endforelse
 
             <tr>
                 <th colspan="2" class="text-end">

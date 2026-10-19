@@ -314,6 +314,7 @@
                             <select name="customer_id"
                                     id="customer_id_payment"
                                     class="form-select"
+                                    autofocus
                                     required>
                                 <option value="">
                                     Select Customer
@@ -554,6 +555,32 @@ document.getElementById('printSimpleLedgerBtn')
             printWindow.close();
         }, 300);
 
+    });
+
+    document.getElementById('paymentModal').addEventListener('shown.bs.modal', function () {
+        const customerSelect = document.getElementById('customer_id_payment');
+        if (customerSelect) {
+            customerSelect.focus();
+            if (typeof customerSelect.showPicker === 'function') {
+                try {
+                    customerSelect.showPicker();
+                } catch (e) {}
+            }
+        }
+    });
+
+    $(document).on('click', '[data-bs-target="#paymentModal"]', function () {
+        setTimeout(function() {
+            const customerSelect = document.getElementById('customer_id_payment');
+            if (customerSelect) {
+                customerSelect.focus();
+                if (typeof customerSelect.showPicker === 'function') {
+                    try {
+                        customerSelect.showPicker();
+                    } catch (e) {}
+                }
+            }
+        }, 150);
     });
 
 </script>

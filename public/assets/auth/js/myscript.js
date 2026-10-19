@@ -715,6 +715,20 @@ $('#paymentModal').on('hidden.bs.modal', function () {
     isCustomerBalanceLoaded = false;
 });
 
+$('#paymentModal').on('shown.bs.modal', function () {
+    setTimeout(function () {
+        const el = document.getElementById('customer_id_payment');
+        if (el) {
+            el.focus();
+            if (typeof el.showPicker === 'function') {
+                try {
+                    el.showPicker();
+                } catch (e) {}
+            }
+        }
+    }, 50);
+});
+
 $(document).on('click', '.paymentBtn', function () {
 
     let customerId = $(this).data('id');

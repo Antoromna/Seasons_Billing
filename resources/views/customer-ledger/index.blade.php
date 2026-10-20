@@ -366,13 +366,13 @@
                             <label class="form-label text-white-50 mb-1 fw-semibold">
                                 Amount (₹)
                             </label>
-                            <input type="number"
+                            <input type="text"
+                                   inputmode="decimal"
                                    name="amount"
                                    id="payment_amount_input"
                                    class="form-control"
                                    placeholder="Enter payment amount"
-                                   step="0.01"
-                                   min="0.01"
+                                   autocomplete="off"
                                    required>
                         </div>
 
@@ -581,6 +581,44 @@ document.getElementById('printSimpleLedgerBtn')
                 }
             }
         }, 150);
+    });
+
+    function formatIndianNumberStr(val) {
+        if (!val && val !== 0) return '';
+        var str = val.toString().replace(/,/g, '');
+        var parts = str.split('.');
+        var intP = parts[0].replace(/\D/g, '');
+        var decP = parts.length > 1 ? parts.slice(1).join('').replace(/\D/g, '').substring(0, 2) : null;
+        if (!intP && decP === null) return '';
+        var formatted = intP ? Number(intP).toLocaleString('en-IN') : (parts.length > 1 ? '0' : '');
+        return decP !== null ? (formatted + '.' + decP) : formatted;
+    }
+
+    $(document).on('input', '#payment_amount_input', function () {
+        var el = this;
+        var val = el.value;
+        if (!val) return;
+        var pos = el.selectionStart;
+        var digitsBefore = val.slice(0, pos).replace(/[^0-9.]/g, '').length;
+        var formatted = formatIndianNumberStr(val);
+        el.value = formatted;
+        var newPos = formatted.length;
+        var count = 0;
+        for (var i = 0; i < formatted.length; i++) {
+            if (/[0-9.]/.test(formatted[i])) count++;
+            if (count === digitsBefore) {
+                newPos = i + 1;
+                break;
+            }
+        }
+        el.setSelectionRange(newPos, newPos);
+    });
+
+    $(document).on('submit', '#paymentModal form', function () {
+        var el = document.getElementById('payment_amount_input');
+        if (el) {
+            el.value = (el.value || '').replace(/,/g, '');
+        }
     });
 
 </script>

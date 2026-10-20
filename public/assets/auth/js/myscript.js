@@ -646,13 +646,55 @@ function renderCustomerBalanceCard(balance) {
     }
 }
 
+function formatIndianNumberString(val) {
+    if (!val && val !== 0) return '';
+    let str = val.toString().replace(/,/g, '');
+    let parts = str.split('.');
+    let integerPart = parts[0].replace(/\D/g, '');
+    let decimalPart = parts.length > 1 ? parts.slice(1).join('').replace(/\D/g, '').substring(0, 2) : null;
+
+    if (!integerPart && decimalPart === null) return '';
+
+    let formattedInt = integerPart ? Number(integerPart).toLocaleString('en-IN') : (parts.length > 1 ? '0' : '');
+
+    if (decimalPart !== null) {
+        return formattedInt + '.' + decimalPart;
+    }
+    return formattedInt;
+}
+
+function handlePaymentAmountCommaFormatting(inputEl) {
+    let originalVal = inputEl.value;
+    if (!originalVal) return;
+
+    let cursorPos = inputEl.selectionStart;
+    let digitsBefore = originalVal.slice(0, cursorPos).replace(/[^0-9.]/g, '').length;
+
+    let formatted = formatIndianNumberString(originalVal);
+    inputEl.value = formatted;
+
+    // Restore cursor position accurately
+    let newPos = formatted.length;
+    let count = 0;
+    for (let i = 0; i < formatted.length; i++) {
+        if (/[0-9.]/.test(formatted[i])) {
+            count++;
+        }
+        if (count === digitsBefore) {
+            newPos = i + 1;
+            break;
+        }
+    }
+    inputEl.setSelectionRange(newPos, newPos);
+}
+
 function updatePaymentCalculation() {
     if (!isCustomerBalanceLoaded) {
         $('#payment_calc_breakdown').addClass('d-none');
         return;
     }
 
-    let amtVal = $('#payment_amount_input').val();
+    let amtVal = ($('#payment_amount_input').val() || '').toString().replace(/,/g, '');
     let enteredAmount = parseFloat(amtVal);
     let discVal = $('#discount_amount').val();
     let discountAmount = parseFloat(discVal) || 0;
@@ -700,8 +742,50 @@ function updatePaymentCalculation() {
     }
 }
 
-$(document).on('input keyup change', '#payment_amount_input, #discount_amount', function () {
+$(document).on('input', '#payment_amount_input', function () {
+    handlePaymentAmountCommaFormatting(this);
     updatePaymentCalculation();
+});
+
+$(document).on('input keyup change', '#discount_amount', function () {
+    updatePaymentCalculation();
+});
+
+$(document).on('keydown', '#payment_amount_input', function (e) {
+    if (e.key === 'Backspace') {
+        let inputEl = this;
+        let cursorPos = inputEl.selectionStart;
+        if (cursorPos === inputEl.selectionEnd && cursorPos > 1) {
+            if (inputEl.value[cursorPos - 1] === ',') {
+                e.preventDefault();
+                let val = inputEl.value;
+                let newVal = val.slice(0, cursorPos - 2) + val.slice(cursorPos);
+                let digitsBefore = val.slice(0, cursorPos - 2).replace(/[^0-9.]/g, '').length;
+                let formatted = formatIndianNumberString(newVal);
+                inputEl.value = formatted;
+
+                let newPos = formatted.length;
+                let count = 0;
+                for (let i = 0; i < formatted.length; i++) {
+                    if (/[0-9.]/.test(formatted[i])) count++;
+                    if (count === digitsBefore) {
+                        newPos = i + 1;
+                        break;
+                    }
+                }
+                inputEl.setSelectionRange(newPos, newPos);
+                updatePaymentCalculation();
+            }
+        }
+    }
+});
+
+// Clean commas before form submit
+$(document).on('submit', '#paymentModal form, form[action*="customer-payment"]', function () {
+    let amtInput = $(this).find('#payment_amount_input');
+    if (amtInput.length) {
+        amtInput.val((amtInput.val() || '').toString().replace(/,/g, ''));
+    }
 });
 
 $('#paymentModal').on('hidden.bs.modal', function () {

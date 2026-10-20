@@ -9,6 +9,12 @@ class CustomerPaymentController extends Controller
 {
     public function store(Request $request)
     {
+        if ($request->has('amount')) {
+            $request->merge([
+                'amount' => str_replace(',', '', (string) $request->amount),
+            ]);
+        }
+
         $request->validate([
             'customer_id'     => 'required',
             'amount'          => 'required|numeric|min:0.01',

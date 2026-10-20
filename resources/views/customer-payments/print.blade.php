@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Receipt</title>
+
+    <style>
+
+        body{
+            margin:0;
+            padding:20px;
+            background:#f5f5f5;
+            font-family:"Times New Roman", serif;
+            font-size:12px;
+        }
+        .section-total{
+            text-align: end;
+        }
+        .invoice{
+            width:500px;
+            margin:0 auto;
+            background:#fff;
+            padding:12px;
+        }
+        .print_header{
+            font-size: 18px !important;
+        }
+        .company{
+            font-size:22px;
+            font-weight:700;
+            color:darkred; /* dark maroon */
+            margin-bottom:2px;
+        }
+
+        .subtitle{
+            font-size:17px;
+            font-weight:600;
+            color:#222;
+            margin-bottom:2px;
+        }
+
+        .address{
+            font-size:17px;
+            font-weight:600;
+            color:#333;
+            line-height:1.2;
+            margin-bottom:4px;
+        }
+
+        .phone{
+            font-size:17px;
+            font-weight:700;
+            color:#333;
+        }
+
+        .text-center{
+            text-align:center;
+        }
+
+        .text-right{
+            text-align:right;
+        }
+
+        .header{
+            padding-bottom:5px;
+            margin-bottom:5px;
+        }
+
+        .small{
+            font-size:11px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        table th,
+        table td{
+            border:2px solid #000;
+            padding:4px;
+        }
+
+        .no-border td{
+            border:none;
+            padding:2px;
+        }
+
+        .summary td{
+            border:2px solid #000;
+            padding:4px;
+        }
+
+        .btn-area{
+            position:fixed;
+            right:20px;
+            top:50px;
+        }
+
+        .btn{
+            display:block;
+            width:140px;
+            padding:10px;
+            margin-bottom:10px;
+            border:none;
+            color:#fff;
+            cursor:pointer;
+            text-decoration:none;
+            text-align:center;
+        }
+
+        .green{
+            background:#198754;
+        }
+
+        .blue{
+            background:#0d6efd;
+        }
+
+        .dark{
+            background:#343a40;
+        }
+        thead th,
+        .total-row td{
+            border:2px solid #000;
+        }
+
+        .item-row td{
+            padding:4px 4px;
+            border-top:none;
+            border-bottom:none;
+        }
+
+        .empty-row td{
+            height:18px;
+            border-left:2px solid #000;
+            border-right:2px solid #000;
+            border-top:none;
+            border-bottom:none;
+        }
+        .balance-table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        .balance-table td{
+            border:none !important;
+            padding:2px 12px;
+            font-size:16px;
+        }
+
+        .balance-table .label{
+            text-align:right;
+            font-size: 18px;
+        }
+
+        .balance-table .colon{
+            text-align:center;
+        }
+
+        .balance-table .amount{
+            text-align:right;
+        }
+        .crate-table{
+            width:100%;
+            border-collapse:collapse;
+            border:2px solid #000;
+        }
+
+        .crate-table th{
+            border:2px solid #000 !important;
+        }
+
+        .crate-table td{
+            border-left:2px solid #000 !important;
+            border-right:2px solid #000 !important;
+            border-top:none !important;
+            border-bottom:none !important;
+        }
+
+        .crate-table tr:last-child td{
+            border-bottom:2px solid #000 !important;
+        }
+
+        @media print{
+
+            .btn-area{
+                display:none;
+            }
+
+            body{
+                background:#fff;
+                padding:0;
+            }
+
+            .invoice{
+                margin:0 auto;
+            }
+
+            @page{
+                margin:5mm;
+            }
+            .page-break{
+                page-break-after: always;
+                break-after: page;
+            }
+
+            .footer-settlement{
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="btn-area">
+
+        <button onclick="window.print()" class="btn green">
+            Print Original
+        </button>
+
+        <button onclick="window.print()" class="btn blue">
+            Print Duplicate
+        </button>
+
+        <a href="{{ url()->previous() }}" class="btn dark">
+            Back
+        </a>
+
+    </div>
+
+    <div class="invoice">
+
+        <div class="header">
+
+            <table class="no-border">
+                <tr>
+                    <td width="25%">
+                        {{-- Logo --}}
+                        <img src="{{ asset('images/Seasons_Logo.png') }}" style="width:115px;height:auto;">
+                    </td>
+
+                    <td class="text-center">
+                        <div class="company">
+                            SEASONS FRUITS TRADERS
+                        </div>
+
+                        <div class="subtitle">
+                            Fresh Fruits Merchants & Commission Agents
+                        </div>
+
+                        <div class="address">
+                            1038, Bakyalakshmi Complex, Big Bazaar Street,<br>
+                            Coimbatore - 641001
+                        </div>
+
+                        <div class="phone">
+                            PH : 9566221566 , 8144008056
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+        <h3 style="
+            text-align:center;
+            color:darkred;
+            font-family:'Times New Roman', serif;
+            font-weight:700;
+            font-size:22px;
+            margin:5px 0;
+            text-decoration:underline;
+        ">
+            PAYMENT RECEIPT
+        </h3>
+        <table class="no-border" style="width:100%;">
+            <tr>
+                <td style="font-size:20px;">
+                    <span style="font-size:20px;">Receipt No :</span>
+                    <span style="font-size:20px; font-weight:700;">
+                        GP-{{ str_pad($payment->id, 4, '0', STR_PAD_LEFT) }}
+                    </span>
+                </td>
+
+                <td class="text-right" style="font-size:20px;">
+                    Date :
+                    <span style="font-weight:700;">
+                        {{ \Carbon\Carbon::parse($payment->payment_date)->format('d/m/Y') }}
+                    </span>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2" style="padding-top:8px; font-size:20px;">
+                    <span style="display:inline-block; width:55px;">
+                        To
+                    </span>
+                    :
+                    <span style="font-weight:700; margin-left:5px;text-transform: uppercase;">
+                        {{ $customer->name ?? '' }}
+                    </span>
+                </td>
+            </tr>
+        </table>
+
+        <br>
+
+        <table>
+
+            <thead>
+                <tr class="print_header">
+                    <th>S.No</th>
+                    <th>Particulars</th>
+                    <th>Crates</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+
+            <tbody style="font-size: 16px;">
+
+                <tr class="item-row">
+                    <td style="text-align: center;">1</td>
+                    <td>GENERAL PAYMENT RECEIVED {{ $payment->remarks ? '(' . strtoupper($payment->remarks) . ')' : '' }}</td>
+                    <td style="text-align:right;text-align: center;">-</td>
+                    <td style="text-align:right;text-align: center;">-</td>
+                    <td style="text-align:right;text-align: center;">-</td>
+                    <td style="text-align:right;">{{ number_format($paidAmount, 2) }}</td>
+                </tr>
+
+                @if($discountAmount > 0)
+                <tr class="item-row">
+                    <td style="text-align: center;">2</td>
+                    <td>DISCOUNT ALLOWED</td>
+                    <td style="text-align:right;text-align: center;">-</td>
+                    <td style="text-align:right;text-align: center;">-</td>
+                    <td style="text-align:right;text-align: center;">-</td>
+                    <td style="text-align:right;">{{ number_format($discountAmount, 2) }}</td>
+                </tr>
+                @endif
+
+                @for($i = ($discountAmount > 0 ? 2 : 1); $i < 6; $i++)
+                <tr class="empty-row">
+                    <td>&nbsp;</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                @endfor
+
+                <tr style="font-weight:bold;font-size: 18px;">
+                    <td colspan="2" style="text-align:right;">
+                        <strong>Total</strong>
+                    </td>
+                    <td style="text-align:right;text-align: center;">
+                        <strong>-</strong>
+                    </td>
+                    <td style="text-align:right;text-align: center;">
+                        <strong>-</strong>
+                    </td>
+                    <td colspan="2" style="text-align:right;">
+                        <strong>{{ number_format($totalCredit, 2) }}</strong>
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+        <div class="footer-settlement" style="page-break-inside: avoid; break-inside: avoid;">
+            <table class="no-border" style="margin-top:5px;">
+                <tr>
+
+                    <td width="45%" valign="top">
+
+                        <table class="crate-table" style="font-size: 18px;">
+                            <tr>
+                                <th>Crates</th>
+                                <th>B</th>
+                                <th>S</th>
+                            </tr>
+
+                            <tr>
+                                <td>Pre Balance</td>
+                                <td style="text-align: end;">{{ $bigBalance }}</td>
+                                <td style="text-align: end;">{{ $smallBalance }}</td>
+                            </tr>
+
+                            <tr>
+                                <td>Todays Sales</td>
+                                <td style="text-align: end;">0</td>
+                                <td style="text-align: end;">0</td>
+                            </tr>
+
+                            <tr>
+                                <td>Balance</td>
+                                <td style="text-align: end;">{{ $bigBalance }}</td>
+                                <td style="text-align: end;">{{ $smallBalance }}</td>
+                            </tr>
+                        </table>
+
+                    </td>
+
+                    {{-- Right Side --}}
+                    <td width="55%" valign="top">
+
+                        <table class="balance-table">
+                            <tr>
+                                <td class="label">Prev. Balance</td>
+                                <td class="colon">: ₹</td>
+                                <td class="amount">
+                                    {{ number_format($previousBalance, 2) }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="label">Amount Paid</td>
+                                <td class="colon">: ₹</td>
+                                <td class="amount">
+                                    {{ number_format($paidAmount, 2) }}
+                                </td>
+                            </tr>
+
+                            @if($discountAmount > 0)
+                            <tr>
+                                <td class="label">Discount</td>
+                                <td class="colon">: ₹</td>
+                                <td class="amount">
+                                    {{ number_format($discountAmount, 2) }}
+                                </td>
+                            </tr>
+                            @endif
+
+                        </table>
+
+                        <div style="border-top:2px solid #2156a5; margin:2px 0 2px 15px;"></div>
+
+                        <table class="balance-table">
+                            <tr>
+                                <td class="label" style="font-size: 20px;"><strong>Net Balance</strong></td>
+                                <td class="colon"><strong>: ₹</strong></td>
+                                <td class="amount" style="font-size: 17px;">
+                                    <strong>{{ number_format($balanceRemaining, 2) }}</strong>
+                                </td>
+                            </tr>
+                        </table>
+                        <div style="border-top:2px solid #2156a5; margin:2px 0 2px 15px;"></div>
+
+                    </td>
+
+                </tr>
+            </table>
+
+            <table style="width:100%; border:none; font-size:14px; line-height:10px; margin-top:5px;">
+                <tr>
+                    <td style="border:none; width:120px;">Bank Details</td>
+                    <td style="border:none; width:10px;">:</td>
+                    <td style="border:none;"><strong>For SEASONS FRUITS TRADERS</strong></td>
+                </tr>
+
+                <tr>
+                    <td style="border:none;">Bank Name / A/c No</td>
+                    <td style="border:none;">:</td>
+                    <td style="border:none;"><strong>HDFC BANK / 50200028709842</strong></td>
+                </tr>
+
+                <tr>
+                    <td style="border:none;">Branch / IFSC Code</td>
+                    <td style="border:none;">:</td>
+                    <td style="border:none;"><strong>VYSIAL STREET / HDFC0005194</strong></td>
+                </tr>
+
+                <tr>
+                    <td colspan="3" style="border:none;padding-top: 15px;">
+                        <table style="width:100%; border:none;">
+                            <tr>
+                                <td style="border:none; text-align:left;">
+                                    E &amp; O.E
+                                </td>
+
+                                <td style="border:none; text-align:right;">
+                                    <strong style="color:#8b0000; font-size:17px;">
+                                        For Seasons Fruits Traders
+                                    </strong>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <div style="border-top:2px solid #2156a5; margin-top:3px;"></div>
+        </div>
+
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        window.print();
+    });
+    window.onload = function () {
+        window.print();
+
+        window.onafterprint = function () {
+            window.close();
+        };
+    };
+    </script>
+</body>
+</html>

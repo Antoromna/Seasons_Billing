@@ -182,6 +182,8 @@ public function bills($customerId)
             }
 
             $data[] = [
+                'type' => 'payment',
+                'payment_id' => $payment->id,
                 'sale_id' => null,
                 'bill_id' => 'General Payment',
                 'date' => $payment->payment_date,

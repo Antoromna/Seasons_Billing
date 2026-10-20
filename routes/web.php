@@ -54,6 +54,8 @@ Route::get('/customer/{customer}/sales', [CustomerPaymentController::class, 'get
 Route::post('/customer-payment/store',
     [CustomerPaymentController::class, 'store'])
     ->name('customer-payment.store');
+Route::get('/customer-payments/{payment}/print', [CustomerPaymentController::class, 'print'])
+    ->name('customer-payments.print');
 Route::get('/sales/{sale}/print', [SaleController::class, 'print'])
     ->name('sales.print');
 Route::prefix('reports')->group(function () {

@@ -28,6 +28,28 @@
         </div>
     </div>
 
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center justify-content-between p-3 mb-4 rounded-3 shadow-sm" role="alert" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #065f46;">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                <div>
+                    <span class="fw-bold">{{ session('success') }}</span>
+                    @if(session('print_payment_id'))
+                        <span class="text-muted ms-2 small d-none d-md-inline">Payment receipt is ready for printing.</span>
+                    @endif
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                @if(session('print_payment_id'))
+                    <a href="{{ route('customer-payments.print', session('print_payment_id')) }}" target="_blank" class="btn btn-sm btn-success fw-semibold px-3 shadow-sm">
+                        <i class="bi bi-printer me-1"></i> Print Payment Receipt
+                    </a>
+                @endif
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    @endif
+
     <!-- Table List Box Panel -->
     <section class="panel-custom mt-3">
         <div class="panel-header-custom">

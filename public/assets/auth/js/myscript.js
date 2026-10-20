@@ -570,15 +570,34 @@ console.log($(this).data());
                 `;
             }
 
+            let billCol = '';
+            if (row.type === 'payment' || row.payment_id) {
+                billCol = `
+                    <a href="javascript:void(0)"
+                       class="viewPaymentReceipt text-primary fw-semibold d-inline-flex align-items-center gap-1"
+                       data-id="${row.payment_id}"
+                       title="Click to print payment receipt">
+                        <span>${row.bill_id}</span>
+                        <i class="bi bi-printer text-success"></i>
+                    </a>
+                `;
+            } else if (row.sale_id) {
+                billCol = `
+                    <a href="javascript:void(0)"
+                       class="viewBill"
+                       data-id="${row.sale_id}">
+                        ${row.bill_id}
+                    </a>
+                    ${updateIcon}
+                `;
+            } else {
+                billCol = `<span>${row.bill_id}</span>`;
+            }
+
             html += `
                 <tr>
                     <td>
-                        <a href="javascript:void(0)"
-                        class="viewBill"
-                        data-id="${row.sale_id}">
-                            ${row.bill_id}
-                        </a>
-                        ${updateIcon}
+                        ${billCol}
                     </td>
                     <td>${row.date} </td>
                     <td>₹ ${row.pending}</td>
@@ -892,8 +911,17 @@ $(document).on('change', '#sale_id', function () {
 $(document).on('click', '.viewBill', function () {
 
     let saleId = $(this).data('id');
+    if (saleId) {
+        window.open('/sales/' + saleId + '/print', '_blank');
+    }
+});
 
-    window.open('/sales/' + saleId + '/print', '_blank');
+$(document).on('click', '.viewPaymentReceipt', function () {
+
+    let paymentId = $(this).data('id');
+    if (paymentId) {
+        window.open('/customer-payments/' + paymentId + '/print', '_blank');
+    }
 });
 //edit sale load
 $(document).ready(function () {

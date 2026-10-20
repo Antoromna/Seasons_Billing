@@ -183,6 +183,78 @@
       gap: 0.6rem;
     }
 
+    /* Modal Form Labels and Box Theming across Light & Dark Modes */
+    .modal-content .form-label {
+      color: var(--admin-text) !important;
+      font-weight: 600;
+    }
+
+    .customer-balance-box {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #1e293b;
+    }
+    .customer-balance-box .balance-title {
+      color: #64748b;
+    }
+    .customer-balance-box .balance-amount-val {
+      color: #0f172a;
+    }
+    .customer-balance-box .balance-icon-wrap {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .payment-calc-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #1e293b;
+    }
+    .payment-calc-box .calc-label {
+      color: #64748b;
+    }
+    .payment-calc-box .calc-val,
+    .payment-calc-box .calc-heading {
+      color: #0f172a;
+    }
+    .payment-calc-box .calc-border-col,
+    .payment-calc-box .calc-divider {
+      border-color: #e2e8f0 !important;
+    }
+
+    html[data-theme="dark"] .customer-balance-box {
+      background: rgba(15, 23, 42, 0.75) !important;
+      border-color: rgba(59, 130, 246, 0.35) !important;
+      color: #ffffff !important;
+    }
+    html[data-theme="dark"] .customer-balance-box .balance-title {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+    html[data-theme="dark"] .customer-balance-box .balance-amount-val {
+      color: #ffffff !important;
+    }
+    html[data-theme="dark"] .customer-balance-box .balance-icon-wrap {
+      background: rgba(59, 130, 246, 0.2) !important;
+      color: #60a5fa !important;
+    }
+
+    html[data-theme="dark"] .payment-calc-box {
+      background: rgba(15, 23, 42, 0.75) !important;
+      border-color: rgba(16, 185, 129, 0.35) !important;
+      color: #ffffff !important;
+    }
+    html[data-theme="dark"] .payment-calc-box .calc-label {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+    html[data-theme="dark"] .payment-calc-box .calc-val,
+    html[data-theme="dark"] .payment-calc-box .calc-heading {
+      color: #ffffff !important;
+    }
+    html[data-theme="dark"] .payment-calc-box .calc-border-col,
+    html[data-theme="dark"] .payment-calc-box .calc-divider {
+      border-color: rgba(148, 163, 184, 0.2) !important;
+    }
+
     /* ==========================================================================
        Dark Mode Design System Overrides
        ========================================================================== */

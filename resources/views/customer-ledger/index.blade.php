@@ -312,9 +312,10 @@
                            id="payment_customer_id">
 
                     <!-- Row 1: Payment Type & Customer in one row -->
+                    <!-- Row 1: Payment Type & Customer in one row -->
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label text-white-50 mb-1 fw-semibold">
+                            <label class="form-label mb-1 fw-semibold">
                                 Payment Type
                             </label>
                             <select name="payment_type"
@@ -330,7 +331,7 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label text-white-50 mb-1 fw-semibold">
+                            <label class="form-label mb-1 fw-semibold">
                                 Customer
                             </label>
                             <select name="customer_id"
@@ -352,14 +353,14 @@
 
                     <!-- Customer Balance Display Card -->
                     <div id="customer_balance_card" class="mb-3 d-none">
-                        <div class="p-2.5 px-3 rounded-3 d-flex justify-content-between align-items-center" style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(59, 130, 246, 0.35);">
+                        <div class="customer-balance-box p-2.5 px-3 rounded-3 d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: rgba(59, 130, 246, 0.2); color: #60a5fa;">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center balance-icon-wrap" style="width: 32px; height: 32px;">
                                     <i class="bi bi-wallet2 fs-6"></i>
                                 </div>
                                 <div>
-                                    <span class="text-white-50 small" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Current Balance:</span>
-                                    <span class="fw-bold fs-6 text-white ms-1" id="customer_balance_amount">₹ 0.00</span>
+                                    <span class="balance-title small" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Current Balance:</span>
+                                    <span class="fw-bold fs-6 ms-1 balance-amount-val" id="customer_balance_amount">₹ 0.00</span>
                                 </div>
                             </div>
                             <div id="customer_balance_status">
@@ -370,7 +371,7 @@
 
                     <!-- Bill selection (shown only if Bill Payment is selected) -->
                     <div class="mb-3 d-none" id="sale_div">
-                        <label class="form-label text-white-50 mb-1 fw-semibold">
+                        <label class="form-label mb-1 fw-semibold">
                             Select Bill
                         </label>
                         <select name="sale_id"
@@ -385,7 +386,7 @@
                     <!-- Row 2: Amount & Discount Amount in one row -->
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label text-white-50 mb-1 fw-semibold">
+                            <label class="form-label mb-1 fw-semibold">
                                 Amount (₹)
                             </label>
                             <input type="text"
@@ -399,7 +400,7 @@
                         </div>
 
                         <div class="col-md-6" id="discount_div">
-                            <label class="form-label text-white-50 mb-1 fw-semibold">
+                            <label class="form-label mb-1 fw-semibold">
                                 Discount Amount (₹)
                             </label>
                             <input type="number"
@@ -413,28 +414,28 @@
                     </div>
 
                     <!-- Live Payment Calculation Breakdown -->
-                    <div id="payment_calc_breakdown" class="p-3 rounded-3 mb-3 d-none" style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(16, 185, 129, 0.35);">
+                    <div id="payment_calc_breakdown" class="payment-calc-box p-3 rounded-3 mb-3 d-none">
                         <div class="row g-2 mb-2" style="font-size: 13px;">
-                            <div class="col-sm-6 d-flex justify-content-between align-items-center pe-sm-3 border-end" style="border-color: rgba(148, 163, 184, 0.2) !important;">
-                                <span class="text-white-50"><i class="bi bi-person-badge me-1"></i> Current Balance:</span>
-                                <span class="fw-semibold text-white fs-6" id="calc_current_bal_val">₹ 0.00</span>
+                            <div class="col-sm-6 d-flex justify-content-between align-items-center pe-sm-3 border-end calc-border-col">
+                                <span class="calc-label"><i class="bi bi-person-badge me-1"></i> Current Balance:</span>
+                                <span class="fw-semibold fs-6 calc-val" id="calc_current_bal_val">₹ 0.00</span>
                             </div>
                             <div class="col-sm-6 d-flex justify-content-between align-items-center ps-sm-3">
-                                <span class="text-white-50"><i class="bi bi-arrow-down-circle me-1" style="color: #38bdf8 !important;"></i> Received Amount:</span>
-                                <span class="fw-bold fs-6" id="calc_received_amt_val" style="color: #38bdf8 !important;">- ₹ 0.00</span>
+                                <span class="calc-label"><i class="bi bi-arrow-down-circle me-1 text-info"></i> Received Amount:</span>
+                                <span class="fw-bold fs-6 text-info" id="calc_received_amt_val">- ₹ 0.00</span>
                             </div>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mb-2 d-none" id="calc_discount_row" style="font-size: 13px;">
-                            <span class="text-white-50"><i class="bi bi-tag text-warning me-1"></i> Discount:</span>
+                            <span class="calc-label"><i class="bi bi-tag text-warning me-1"></i> Discount:</span>
                             <span class="fw-semibold text-warning fs-6" id="calc_discount_amt_val">- ₹ 0.00</span>
                         </div>
-                        <div class="border-top my-2" style="border-color: rgba(148, 163, 184, 0.2) !important;"></div>
+                        <div class="calc-divider border-top my-2"></div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-white" id="calc_remaining_label" style="font-size: 14px;">
+                            <span class="fw-bold calc-heading" id="calc_remaining_label" style="font-size: 14px;">
                                 <i class="bi bi-hourglass-split text-warning me-1"></i> Balance After Payment:
                             </span>
                             <div class="d-flex align-items-center gap-2">
-                                <span class="fw-bold fs-5" id="calc_remaining_bal_val" style="color: #34d399;">
+                                <span class="fw-bold fs-5 text-success" id="calc_remaining_bal_val">
                                     ₹ 0.00
                                 </span>
                                 <span id="calc_settlement_badge">
@@ -446,7 +447,7 @@
 
                     <!-- Payment Date -->
                     <div class="mb-3">
-                        <label class="form-label text-white-50 mb-1 fw-semibold">
+                        <label class="form-label mb-1 fw-semibold">
                             Payment Date
                         </label>
                         <input type="date"
@@ -457,7 +458,7 @@
 
                     <!-- Remarks in separate row as previous -->
                     <div class="mb-3">
-                        <label class="form-label text-white-50 mb-1 fw-semibold">
+                        <label class="form-label mb-1 fw-semibold">
                             Remarks
                         </label>
                         <textarea name="remarks"

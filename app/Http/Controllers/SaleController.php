@@ -173,7 +173,7 @@ public function store(Request $request)
         DB::commit();
 
         return redirect()
-            ->route('sales.index')
+            ->route('sales.create')
             ->with('success', 'Sale Created Successfully');
 
     } catch (\Exception $e) {

@@ -356,22 +356,61 @@
 
     </form>
 
+    @if(session('success'))
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+        <div class="toast show text-white bg-success border-0 shadow">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    {{ session('success') }}
+                </div>
+
+                <button type="button"
+                        class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            function autoOpenCustomerDropdown() {
+                var custEl = document.getElementById('customer_id');
+                if (custEl && custEl.tomselect) {
+                    setTimeout(function () {
+                        if (!custEl.value) {
+                            custEl.tomselect.focus();
+                            custEl.tomselect.open();
+                        }
+                    }, 80);
+                    setTimeout(function () {
+                        if (!custEl.value && !custEl.tomselect.isOpen) {
+                            custEl.tomselect.focus();
+                            custEl.tomselect.open();
+                        }
+                    }, 300);
+                } else if (custEl) {
+                    setTimeout(autoOpenCustomerDropdown, 50);
+                }
+            }
+            autoOpenCustomerDropdown();
+
+            // Auto dismiss success toast after 3.5s
+            var toastEl = document.querySelector('.toast');
+            if (toastEl) {
+                setTimeout(function () {
+                    if (window.bootstrap && bootstrap.Toast) {
+                        var bsToast = bootstrap.Toast.getOrCreateInstance(toastEl);
+                        bsToast.hide();
+                    } else {
+                        toastEl.classList.remove('show');
+                    }
+                }, 3500);
+            }
+        });
+    </script>
+
 </div>
 
 @endsection
-@if(session('success'))
-<div class="toast-container position-fixed top-0 end-0 p-3">
-    <div class="toast show text-white bg-success border-0">
-        <div class="d-flex">
-            <div class="toast-body">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                {{ session('success') }}
-            </div>
-
-            <button type="button"
-                    class="btn-close btn-close-white me-2 m-auto"
-                    data-bs-dismiss="toast"></button>
-        </div>
-    </div>
-</div>
-@endif

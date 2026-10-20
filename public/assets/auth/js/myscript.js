@@ -1053,7 +1053,8 @@ $(document).ready(function () {
         const custEl = document.getElementById('customer_id');
         if (custEl && custEl.tomselect) {
             const ts = custEl.tomselect;
-            if (ts.control_input) {
+            if (ts.control_input && !ts.control_input._enterBound) {
+                ts.control_input._enterBound = true;
                 ts.control_input.addEventListener('keydown', function (e) {
                     if (e.key === 'Enter') {
                         setTimeout(function () {
@@ -1063,6 +1064,24 @@ $(document).ready(function () {
                         }, 60);
                     }
                 });
+            }
+
+            // Automatically open Customer dropdown in default state on DC sales create page
+            const isSalesCreate = window.location.pathname.includes('/sales/create') ||
+                ($('form[action*="/sales"]').length && !$('input[name="_method"]').length);
+
+            if (isSalesCreate && !ts.getValue()) {
+                setTimeout(function () {
+                    ts.focus();
+                    ts.open();
+                }, 80);
+
+                setTimeout(function () {
+                    if (!ts.getValue() && !ts.isOpen) {
+                        ts.focus();
+                        ts.open();
+                    }
+                }, 300);
             }
         } else if (custEl) {
             setTimeout(setupCustomerTomSelect, 100);

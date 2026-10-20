@@ -245,9 +245,9 @@
                                 <th>S.No</th>
                                 <th>Product</th>
                                 <th>Unit</th>
-                                <th>Qty</th>
                                 <th>Tray</th>
                                 <th>Tray Count</th>
+                                <th>Qty</th>
                                 <th>Price</th>
                                 <th>Total</th>
                                 <th>Action</th>

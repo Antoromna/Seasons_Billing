@@ -329,9 +329,9 @@
                         <th>S.No</th>
                         <th>Product</th>
                         <th>Unit</th>
-                        <th>Qty</th>
                         <th>Tray</th>
                         <th>Tray Count</th>
+                        <th>Qty</th>
                         <th>Price</th>
                         <th>Total</th>
                         <th>Action</th>
@@ -1101,17 +1101,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 <td>
 
-                    ${quantity}
-
-                    <input type="hidden"
-                           name="bills[${billSection.dataset.billNo}][items][${rowCount}][quantity]"
-                           value="${quantity}">
-
-                </td>
-
-
-                <td>
-
                     ${escapeHtml(trayType)}
 
                     <input type="hidden"
@@ -1128,6 +1117,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     <input type="hidden"
                            name="bills[${billSection.dataset.billNo}][items][${rowCount}][tray_qty]"
                            value="${trayCount}">
+
+                </td>
+
+
+                <td>
+
+                    ${quantity}
+
+                    <input type="hidden"
+                           name="bills[${billSection.dataset.billNo}][items][${rowCount}][quantity]"
+                           value="${quantity}">
 
                 </td>
 

@@ -273,9 +273,9 @@
                                 <th>S.No</th>
                                 <th>Product</th>
                                 <th>Unit</th>
-                                <th>Qty</th>
                                 <th>Tray</th>
                                 <th>Tray Count</th>
+                                <th>Qty</th>
                                 <th>Price</th>
                                 <th>Total</th>
                                 <th>Action</th>
@@ -322,19 +322,6 @@
                                     </td>
 
 
-                                    {{-- Qty --}}
-                                    <td style="width: 110px;">
-
-                                        <input type="number"
-                                            class="form-control qty"
-                                            name="products[{{ $key }}][quantity]"
-                                            value="{{ $item->quantity }}"
-                                            min="0"
-                                            step="0.001">
-
-                                    </td>
-
-
                                     {{-- Tray --}}
                                     <td style="width: 130px;">
 
@@ -369,6 +356,19 @@
                                             name="products[{{ $key }}][tray_qty]"
                                             value="{{ $item->tray_qty }}"
                                             min="0">
+
+                                    </td>
+
+
+                                    {{-- Qty --}}
+                                    <td style="width: 110px;">
+
+                                        <input type="number"
+                                            class="form-control qty"
+                                            name="products[{{ $key }}][quantity]"
+                                            value="{{ $item->quantity }}"
+                                            min="0"
+                                            step="0.001">
 
                                     </td>
 
@@ -952,18 +952,6 @@ document.addEventListener('DOMContentLoaded', function () {
             </td>
 
 
-            <td style="width: 110px;">
-
-                <input type="number"
-                       class="form-control qty"
-                       name="products[${index}][quantity]"
-                       value="${qty}"
-                       min="0"
-                       step="0.001">
-
-            </td>
-
-
             <td style="width: 130px;">
 
                 <select class="form-select tray"
@@ -996,6 +984,18 @@ document.addEventListener('DOMContentLoaded', function () {
                        name="products[${index}][tray_qty]"
                        value="${selectedTrayCount}"
                        min="0">
+
+            </td>
+
+
+            <td style="width: 110px;">
+
+                <input type="number"
+                       class="form-control qty"
+                       name="products[${index}][quantity]"
+                       value="${qty}"
+                       min="0"
+                       step="0.001">
 
             </td>
 

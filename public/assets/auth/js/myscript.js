@@ -323,14 +323,6 @@ function addProductRow()
         </td>
 
         <td>
-            ${quantity}
-
-            <input type="hidden"
-                   name="products[${rowCount}][quantity]"
-                   value="${quantity}">
-        </td>
-
-        <td>
             ${trayType}
 
             <input type="hidden"
@@ -344,6 +336,14 @@ function addProductRow()
             <input type="hidden"
                    name="products[${rowCount}][tray_qty]"
                    value="${trayCount}">
+        </td>
+
+        <td>
+            ${quantity}
+
+            <input type="hidden"
+                   name="products[${rowCount}][quantity]"
+                   value="${quantity}">
         </td>
 
         <td>

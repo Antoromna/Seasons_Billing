@@ -258,6 +258,26 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Today DC Amount Received -->
+            <div class="col-12 col-sm-6 col-xl">
+                <div class="stat-card-modern border-success border-opacity-25" style="background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);">
+                    <div class="card-accent-bg bg-success"></div>
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-success fs-7 fw-bold text-uppercase">DC Amt Received</span>
+                            <span class="badge bg-success text-white px-2 py-0.5 rounded-pill" style="font-size:0.7rem;">Today</span>
+                        </div>
+                        <div class="icon-box icon-success">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-1 text-success">₹{{ number_format($dcReceivedAmount, 2) }}</h3>
+                    <div class="d-flex align-items-center gap-1 text-muted small">
+                        <i class="bi bi-arrow-down-left-circle text-success"></i> {{ $dcReceivedCount }} {{ Str::plural('Payment', $dcReceivedCount) }} Received
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- Global Date Range Filter Header -->

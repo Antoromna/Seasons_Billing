@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Models\CustomerPayment;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,11 @@ class HomeController extends Controller
         $totalSaleAmount = $dcSaleAmount + $cashSaleAmount;
         $totalSaleBills  = $dcSaleBills + $cashSaleBills;
 
+        // Today's DC Amount Received (Customer Payments)
+        $dcReceived = CustomerPayment::whereDate('payment_date', $today);
+        $dcReceivedAmount = (float) $dcReceived->sum('amount');
+        $dcReceivedCount  = $dcReceived->count();
+
         $recentUsers = Customer::latest()->take(5)->get();
 
         // Period filter for overview and product charts
@@ -75,6 +81,8 @@ class HomeController extends Controller
             'cashSaleBills',
             'totalSaleAmount',
             'totalSaleBills',
+            'dcReceivedAmount',
+            'dcReceivedCount',
             'salesOverview',
             'topProductsData',
             'dailyProductSalesData'

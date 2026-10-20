@@ -286,6 +286,45 @@ document.querySelectorAll('input[name="bill_type"]').forEach(function (radio) {
     });
 
 });
+
+// Auto dismiss toasts
+setTimeout(function () {
+    document.querySelectorAll('.toast').forEach(function (toastEl) {
+        if (window.bootstrap && bootstrap.Toast) {
+            bootstrap.Toast.getOrCreateInstance(toastEl).hide();
+        } else {
+            toastEl.classList.remove('show');
+        }
+    });
+}, 3500);
 </script>
+
+@if(session('success'))
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+    <div class="toast show text-white bg-success border-0 shadow">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                {{ session('success') }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+@endif
+
+@if(session('error'))
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+    <div class="toast show text-white bg-danger border-0 shadow">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                {{ session('error') }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+@endif
 
 @endsection

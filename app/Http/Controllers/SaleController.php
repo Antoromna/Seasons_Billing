@@ -269,6 +269,38 @@ public function update(Request $request, Sale $sale)
         return back()->with('error', $e->getMessage());
     }
 }
+
+public function destroy($sale)
+{
+    DB::beginTransaction();
+
+    try {
+        if (!$sale instanceof Sale) {
+            $sale = Sale::findOrFail($sale);
+        }
+
+        $sale->items()->delete();
+
+        CustomerPayment::where('sale_id', $sale->id)->delete();
+
+        $sale->delete();
+
+        DB::commit();
+
+        return redirect()
+            ->route('sales.index')
+            ->with('success', 'Sale Deleted Successfully');
+
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+
+        return redirect()
+            ->route('sales.index')
+            ->with('error', 'Error deleting sale: ' . $e->getMessage());
+    }
+}
+
 public function bulkPrint(Request $request)
 {
     $ids = explode(',', $request->ids);

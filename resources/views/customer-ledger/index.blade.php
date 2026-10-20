@@ -407,9 +407,7 @@
                                    name="discount_amount"
                                    id="discount_amount"
                                    class="form-control"
-                                   value="0"
-                                   min="0"
-                                   step="0.01">
+                                   placeholder="Enter discount amount">
                         </div>
                     </div>
 

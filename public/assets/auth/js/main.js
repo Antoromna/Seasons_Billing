@@ -256,9 +256,48 @@ $(document).ready(function () {
     $('.searchable-select').each(function () {
         new TomSelect(this, {
             create: false,
-            sortField: {
-                field: 'text',
-                direction: 'asc'
+            searchField: ['text'],
+            sortField: [
+                { field: '$score', direction: 'desc' },
+                { field: 'text', direction: 'asc' }
+            ],
+            score: function (query) {
+                var cleanQuery = (query || '').trim().toLowerCase();
+                if (!cleanQuery) return function () { return 1; };
+                var normQuery = cleanQuery.replace(/[\s\-_.]+/g, '');
+
+                return function (item) {
+                    var text = (item.text || item.label || '').trim().toLowerCase();
+                    if (!text) return 0;
+                    if (!item.value && item.value !== 0 && text.startsWith('select')) return 0;
+
+                    var normText = text.replace(/[\s\-_.]+/g, '');
+
+                    // Exact match
+                    if (text === cleanQuery || (normQuery && normText === normQuery)) {
+                        return 1000;
+                    }
+
+                    // Starts with query at beginning of string (highest priority prefix match)
+                    if (text.startsWith(cleanQuery) || (normQuery && normText.startsWith(normQuery))) {
+                        return 500;
+                    }
+
+                    // Any word within string starts with query (word-boundary prefix match)
+                    var words = text.split(/\s+/);
+                    for (var i = 0; i < words.length; i++) {
+                        if (words[i].startsWith(cleanQuery)) {
+                            return 250;
+                        }
+                    }
+
+                    // Substring match anywhere else
+                    if (text.indexOf(cleanQuery) !== -1 || (normQuery && normText.indexOf(normQuery) !== -1)) {
+                        return 100;
+                    }
+
+                    return 0;
+                };
             }
         });
     });

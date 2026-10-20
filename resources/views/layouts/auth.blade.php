@@ -618,8 +618,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 
-<script src="{{ asset('assets/auth/js/main.js') }}"></script>
-<script src="{{ asset('assets/auth/js/myscript.js') }}"></script>
+<script src="{{ asset('assets/auth/js/main.js') }}?v={{ filemtime(public_path('assets/auth/js/main.js')) }}"></script>
+<script src="{{ asset('assets/auth/js/myscript.js') }}?v={{ filemtime(public_path('assets/auth/js/myscript.js')) }}"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>

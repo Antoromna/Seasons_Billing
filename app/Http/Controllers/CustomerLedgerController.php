@@ -42,10 +42,8 @@ class CustomerLedgerController extends Controller
         // Sort all customers alphabetically (case-insensitive)
         $allCustomers = $allCustomers->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->values();
 
-        // Only show customers where amount to receive is greater than zero
-        $customers = $allCustomers->filter(function ($customer) {
-            return (float) $customer->due_amount > 0;
-        });
+        // Customer ledger index shows all customers including those with 0 amount to receive
+        $customers = $allCustomers;
 
         if ($request->filled('search')) {
             $searchTerm = strtolower(trim($request->search));
@@ -226,9 +224,9 @@ public function bills($customerId)
                 ($paymentsReceived + $discountReceived);
         }
 
-        // Only show customers where amount to receive is greater than zero, sorted alphabetically
+        // In print: exclude customers whose amount to receive is 0 (only show dues > 0), sorted alphabetically
         $customers = $customers->filter(function ($customer) {
-            return (float) $customer->due_amount > 0;
+            return round((float) $customer->due_amount, 2) > 0;
         })->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->values();
 
         return view('customer-ledger.print', compact('customers'));

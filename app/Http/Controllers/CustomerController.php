@@ -13,9 +13,9 @@ class CustomerController extends Controller
      */
     public function index()
     {
-         $customers = Customer::latest()->get();
+        $customers = Customer::orderByRaw('LOWER(name) ASC')->get();
 
-    return view('customers.index', compact('customers'));
+        return view('customers.index', compact('customers'));
     }
 
     /**
@@ -148,8 +148,7 @@ class CustomerController extends Controller
     }
     public function print()
     {
-        $customers = Customer::all();
-       
+        $customers = Customer::orderByRaw('LOWER(name) ASC')->get();
 
         return view('customers.print', compact('customers'));
     }

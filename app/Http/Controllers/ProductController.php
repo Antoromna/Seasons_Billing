@@ -12,7 +12,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::latest()->get();
+        $products = Product::orderByRaw('LOWER(name) ASC')->get();
 
         return view('products.index', compact('products'));
     }
@@ -124,7 +124,7 @@ class ProductController extends Controller
     }
     public function print()
     {
-        $products = Product::orderBy('name')->get();
+        $products = Product::orderByRaw('LOWER(name) ASC')->get();
 
         return view('products.print', compact('products'));
     }
